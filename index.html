@@ -1,38 +1,68 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cuenta atrás</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 </head>
 <body>
-  <div class="countdown-container">
-    <div class="image-circle">
-        <img id="carousel-image" src="1.png" alt="Foto 2">
-    </div>
-    <h1>Lily 🌸</h1>
-    <div class="countdown">
-  <div class="time-box big-box">
-    <span id="days" class="number">0</span>
-    <span class="label">Días</span>
+
+  <!-- Pop-up saludo + botón desbloqueo -->
+  <div id="popup-message" class="popup">
+    <p id="popup-text"></p>
+    <button id="unlock-btn">🔒 Desbloquear contador</button>
   </div>
 
-  <div class="sub-countdown">
-    <div class="time-box">
-      <span id="hours" class="number">0</span>
-      <span class="label">Horas</span>
-    </div>
-    <div class="time-box">
-      <span id="minutes" class="number">0</span>
-      <span class="label">Minutos</span>
-    </div>
-    <div class="time-box">
-      <span id="seconds" class="number">0</span>
-      <span class="label">Segundos</span>
-    </div>
+<!-- Pop-up pregunta -->
+<div id="question-popup" class="popup hidden">
+  <p id="question-text">¿Pregunta?</p>
+  <div class="input-container">
+    <input type="text" id="answer-input" placeholder="Escribe tu respuesta...">
+    <span id="change-question" class="material-symbols-outlined refresh-icon" title="Cambiar pregunta">refresh</span>
   </div>
+  <button id="submit-answer">Enviar</button>
+  <p id="error-message" class="error-message"></p>
 </div>
+
+<div id="question-popup" class="popup hidden">
+  <p id="question-text">¿Pregunta?</p>
+  <div class="input-with-icon">
+    <input type="text" id="answer-input" placeholder="Escribe tu respuesta...">
+    <span id="change-question" class="material-symbols-outlined refresh-icon" title="Cambiar pregunta">refresh</span>
+  </div>
+  <button id="submit-answer">Enviar</button>
+  <p id="error-message" class="error-message"></p>
+</div>
+
+
+  <!-- Contenido principal -->
+  <div class="main-content blur">
+    <div class="countdown-container">
+      <div class="image-circle">
+        <img id="carousel-image" src="1.png" alt="Foto decorativa" />
+      </div>
+      <h1>Lily 🌸</h1>
+      <div class="countdown">
+        <div class="time-box">
+          <span id="days" class="number">0</span>
+          <span class="label">Días</span>
+        </div>
+        <div class="time-box">
+          <span id="hours" class="number">0</span>
+          <span class="label">Horas</span>
+        </div>
+        <div class="time-box">
+          <span id="minutes" class="number">0</span>
+          <span class="label">Minutos</span>
+        </div>
+        <div class="time-box">
+          <span id="seconds" class="number">0</span>
+          <span class="label">Segundos</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
