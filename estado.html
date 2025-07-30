@@ -10,45 +10,92 @@
 <body>
   <div class="container">
     <h1>Mi estado anímico actual se representa así:</h1>
-    
-    <video id="estado-video" autoplay muted loop></video>
-    
-    <button onclick="recargarEstado()" class="icon-button">
+
+    <div class="video-wrapper">
+      <video id="estado-video"
+             autoplay
+             muted
+             loop
+             playsinline
+             webkit-playsinline
+             preload="auto">
+      </video>
+
+      <!-- Capa para móviles si el autoplay es bloqueado -->
+      <button id="tap-overlay" class="tap-overlay">
+        <span class="material-symbols-outlined">play_arrow</span>
+        <span>Toca para reproducir</span>
+      </button>
+    </div>
+
+    <button id="refresh-btn" class="icon-button" aria-label="Cambiar estado">
       <span class="material-symbols-outlined">refresh</span>
     </button>
-    
+
     <a href="index.html" class="floating-button">⬅ Volver</a>
   </div>
 
   <script>
     const videos = [
-      "videos/1.mp4",
-      "videos/2.mp4",
-      "videos/3.mp4",
-      "videos/4.mp4",
-      "videos/5.mp4",
-      "videos/6.mp4",
-      "videos/7.mp4",
-      "videos/8.mp4",
-      "videos/9.mp4",
-      "videos/10.mp4",
-      "videos/11.mp4",
-      "videos/12.mp4",
-      "videos/13.mp4",
-      "videos/14.mp4",
-      "videos/15.mp4"
+      "videos/1.mp4","videos/2.mp4","videos/3.mp4","videos/4.mp4","videos/5.mp4",
+      "videos/6.mp4","videos/7.mp4","videos/8.mp4","videos/9.mp4","videos/10.mp4",
+      "videos/11.mp4","videos/12.mp4","videos/13.mp4","videos/14.mp4","videos/15.mp4"
     ];
 
+    const videoEl = document.getElementById("estado-video");
+    const overlay = document.getElementById("tap-overlay");
+    const refreshBtn = document.getElementById("refresh-btn");
+
     function getRandomVideo() {
-      const index = Math.floor(Math.random() * videos.length);
-      return videos[index];
+      const i = Math.floor(Math.random() * videos.length);
+      return videos[i];
     }
 
-    function recargarEstado() {
-      location.reload();
+    function setRandomSrc() {
+      const src = getRandomVideo();
+      // Asegurar flags antes de asignar src (iOS)
+      videoEl.muted = true;
+      videoEl.setAttribute("playsinline", "");
+      videoEl.setAttribute("webkit-playsinline", "");
+      videoEl.src = src;
+      videoEl.load();
     }
 
-    document.getElementById("estado-video").src = getRandomVideo();
+    async function tryPlay() {
+      try {
+        await videoEl.play();
+        overlay.classList.add("hidden");
+      } catch (e) {
+        // Autoplay bloqueado → mostrar overlay para tocar
+        overlay.classList.remove("hidden");
+      }
+    }
+
+    function changeVideo() {
+      setRandomSrc();
+      // Reintentar reproducir el nuevo clip
+      tryPlay();
+    }
+
+    // Overlay: tocar para reproducir
+    overlay.addEventListener("click", async () => {
+      overlay.classList.add("hidden");
+      try {
+        await videoEl.play();
+      } catch (e) {
+        // Si aún falla, forzar de nuevo
+        await tryPlay();
+      }
+    });
+
+    // Botón refrescar: cambiar a otro vídeo sin recargar
+    refreshBtn.addEventListener("click", changeVideo);
+
+    // Al cargar
+    document.addEventListener("DOMContentLoaded", () => {
+      setRandomSrc();
+      tryPlay();
+    });
   </script>
 </body>
 </html>

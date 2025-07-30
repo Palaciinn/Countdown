@@ -25,10 +25,41 @@ h1 {
   margin-bottom: 20px;
 }
 
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 video {
   width: 100%;
   border-radius: 15px;
-  margin-bottom: 20px;
+  display: block;
+}
+
+/* Overlay para móviles cuando autoplay está bloqueado */
+.tap-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(30, 41, 59, 0.55);
+  color: #fff;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tap-overlay.hidden {
+  display: none;
+}
+
+.tap-overlay .material-symbols-outlined {
+  font-size: 40px;
 }
 
 .icon-button {
@@ -41,8 +72,12 @@ video {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.15s ease;
   margin-bottom: 10px;
+}
+
+.icon-button:active {
+  transform: scale(0.95) rotate(-20deg);
 }
 
 .icon-button:hover {
@@ -54,16 +89,7 @@ video {
   font-size: 28px;
 }
 
-.volver-btn {
-  display: block;
-  margin-top: 15px;
-  text-decoration: none;
-  font-weight: bold;
-  color: #2563eb;
-}
-
-
-
+/* Botón flotante como en feedback */
 .floating-button {
   position: fixed;
   bottom: 20px;
@@ -75,7 +101,7 @@ video {
   border-radius: 9999px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   transition: background-color 0.3s ease;
 }
