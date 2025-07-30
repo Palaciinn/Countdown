@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recados</title>
+  <link rel="stylesheet" href="recados.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=add,close,delete" />
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>📜 Recados pendientes</h1>
+  </header>
+
+  <main>
+    <!-- Tarjeta Angel -->
+    <div class="card">
+      <h2>🩵 Angel</h2>
+      <ul id="recados-angel" class="recados-list">
+        <!-- Ejemplo de recado -->
+        <!--
+        <li class="recado-item">
+          <label>
+            <input type="checkbox" />
+            Comprar café
+          </label>
+          <button class="delete-recado material-symbols-outlined">delete</button>
+        </li>
+        -->
+      </ul>
+    </div>
+
+    <!-- Tarjeta Lily -->
+    <div class="card">
+      <h2>🌸 Lily</h2>
+      <ul id="recados-lily" class="recados-list"></ul>
+    </div>
+  </main>
+
+  <!-- Botón flotante para añadir recado -->
+  <a href="#" class="floating-button add-recado-btn" id="open-add-recado">
+    <span class="material-symbols-outlined">add</span>
+  </a>
+
+  <!-- Formulario emergente para nuevo recado -->
+  <div class="popup-form hidden" id="recado-popup">
+    <div class="popup-content">
+      <span class="material-symbols-outlined close-btn" id="close-popup">close</span>
+      <h2>➕ Nuevo recado</h2>
+      <select id="recado-user">
+        <option value="">Seleccionar persona</option>
+        <option value="Angel">Angel</option>
+        <option value="Lily">Lily</option>
+      </select>
+      <input type="text" id="recado-text" placeholder="Escribe el recado..." />
+      <button id="add-recado-btn">Añadir</button>
+    </div>
+  </div>
+
+  <!-- Botón Volver -->
+  <a href="index.html" class="floating-button">⬅ Volver</a>
+
+  <script type="module" src="recados.js"></script>
+</body>
+</html>
