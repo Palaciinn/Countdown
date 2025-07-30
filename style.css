@@ -312,6 +312,7 @@ body {
   display: flex;
   justify-content: center;
   margin-top: 40px;      /* separa del bloque anterior */
+  margin-bottom: 20px;
 }
 
 /* Animación de sacudida suave */
