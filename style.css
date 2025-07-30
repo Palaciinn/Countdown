@@ -304,3 +304,25 @@ body {
   background-color: #334155;
   transform: scale(1.05);
 }
+
+/* Contenedor independiente para el botón de regalo */
+.gift-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;      /* separa del bloque anterior */
+}
+
+/* Animación de sacudida suave */
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-6deg); }
+  40% { transform: rotate(6deg); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(4deg); }
+}
+
+/* Aplicar a botón de regalo */
+.gift-container .circle-button {
+  animation: shake 1.2s ease-in-out infinite;
+  animation-delay: 1.5s;
+}
