@@ -6,7 +6,7 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Mostrar popup para añadir evento
+// === Mostrar popup para añadir evento ===
 document.getElementById("open-add-event").addEventListener("click", (e) => {
   e.preventDefault();
   document.getElementById("event-popup").classList.remove("hidden");
@@ -15,7 +15,7 @@ document.getElementById("close-popup").addEventListener("click", () => {
   document.getElementById("event-popup").classList.add("hidden");
 });
 
-// Añadir evento
+// === Añadir evento dinámico ===
 document.getElementById("add-event-btn").addEventListener("click", async () => {
   const title = document.getElementById("event-title").value.trim();
   const dateValue = document.getElementById("event-date").value;
@@ -31,7 +31,7 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
     fixedDate.setFullYear(now.getFullYear() + 1);
   }
 
-  // Insertar en Supabase (fecha como string para bigint)
+  // Insertar en Supabase
   const { data, error } = await supabase
     .from('eventos')
     .insert([{ 
@@ -47,8 +47,6 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
   }
 
   console.log("✅ Evento guardado correctamente:", data);
-
-  // Mostrar en la interfaz
   renderEvent({ titulo: title, fecha: fixedDate.getTime(), fijo: false });
 
   document.getElementById("event-title").value = "";
@@ -56,18 +54,7 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
   document.getElementById("event-popup").classList.add("hidden");
 });
 
-// Mostrar todos los eventos
-window.addEventListener("DOMContentLoaded", async () => {
-  const { data, error } = await supabase.from('eventos').select('*');
-  if (error) {
-    console.error("Error al cargar eventos:", error);
-    return;
-  }
-
-  data.forEach(evento => renderEvent(evento));
-});
-
-// Mostrar un evento con cuenta atrás
+// === Renderizar un evento en la lista ===
 function renderEvent(evento) {
   const container = document.getElementById("event-list");
   const fecha = new Date(Number(evento.fecha));
@@ -78,7 +65,13 @@ function renderEvent(evento) {
 
   card.innerHTML = `
     <h2>${isBirthday ? "🎂" : "🎉"} ${evento.titulo}</h2>
-    <p class="date-note">${fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+    <p class="date-note">${fecha.toLocaleDateString("es-ES", { 
+      day: "numeric", 
+      month: "long", 
+      year: "numeric", 
+      hour: "2-digit", 
+      minute: "2-digit" 
+    })}</p>
     <div class="countdown"></div>
     ${!isBirthday ? `<button class="delete-btn">🗑️ Eliminar</button>` : ""}
   `;
@@ -86,7 +79,7 @@ function renderEvent(evento) {
   container.appendChild(card);
   iniciarCuentaAtras(card.querySelector(".countdown"), fecha.getTime());
 
-  // Si no es cumpleaños, permitir eliminar
+  // Botón eliminar solo para eventos dinámicos
   if (!isBirthday) {
     card.querySelector(".delete-btn").addEventListener("click", async () => {
       const { error } = await supabase.from('eventos').delete().eq('id', evento.id);
@@ -100,7 +93,7 @@ function renderEvent(evento) {
   }
 }
 
-// Cuenta atrás
+// === Función cuenta atrás ===
 function iniciarCuentaAtras(elemento, fechaObjetivo) {
   const intervalo = setInterval(() => {
     const diff = fechaObjetivo - Date.now();
@@ -123,8 +116,9 @@ function iniciarCuentaAtras(elemento, fechaObjetivo) {
   }, 1000);
 }
 
-// Inicializar cumpleaños fijos que están en el HTML
-window.addEventListener("DOMContentLoaded", () => {
+// === Inicializar cumpleaños y cargar eventos Supabase ===
+window.addEventListener("DOMContentLoaded", async () => {
+  // 1️⃣ Inicializar cumpleaños fijos
   document.querySelectorAll(".countdown[data-date]").forEach(el => {
     let targetDate = new Date(el.dataset.date);
     const now = new Date();
@@ -133,4 +127,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     iniciarCuentaAtras(el, targetDate.getTime());
   });
+
+  // 2️⃣ Cargar eventos guardados en Supabase
+  const { data, error } = await supabase.from('eventos').select('*');
+  if (error) {
+    console.error("Error al cargar eventos:", error);
+    return;
+  }
+  data.forEach(evento => renderEvent(evento));
 });
