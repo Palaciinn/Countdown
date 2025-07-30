@@ -30,6 +30,8 @@
 
   <!-- Contenido principal -->
   <div class="main-content blur">
+
+    <!-- Imagen y cuenta atrás -->
     <div class="countdown-container">
       <div class="image-circle">
         <img id="carousel-image" src="1.png" alt="Foto decorativa" />
@@ -37,18 +39,22 @@
       <h1>Lily 🌸</h1>
       <div class="countdown">
         <div class="time-box">
+          <div class="starry-background"></div>
           <span id="days" class="number">0</span>
           <span class="label">Días</span>
         </div>
         <div class="time-box">
+          <div class="starry-background"></div>
           <span id="hours" class="number">0</span>
           <span class="label">Horas</span>
         </div>
         <div class="time-box">
+          <div class="starry-background"></div>
           <span id="minutes" class="number">0</span>
           <span class="label">Minutos</span>
         </div>
         <div class="time-box">
+          <div class="starry-background"></div>
           <span id="seconds" class="number">0</span>
           <span class="label">Segundos</span>
         </div>
@@ -58,21 +64,31 @@
 
     <hr class="custom-separator">
 
-<h2 class="section-title">Funciones</h2>
+    <h2 class="section-title">Funciones</h2>
 
-<!-- Botones principales -->
-<div class="button-container">
-  <button class="custom-button" onclick="location.href='feedback.html'">Enviar feedback</button>
-  <button class="custom-button" onclick="location.href='estado.html'">Mi estado anímico</button>
-  <button class="custom-button" onclick="location.href='kms.html'">Calculadora de Kms</button>
-</div>
+    <!-- Botones principales con estrellas -->
+    <div class="button-container">
+      <button class="custom-button">
+        <div class="starry-background"></div>
+        Enviar feedback
+      </button>
+      <button class="custom-button">
+        <div class="starry-background"></div>
+        Mi estado anímico
+      </button>
+      <button class="custom-button">
+        <div class="starry-background"></div>
+        Calculadora de Kms
+      </button>
+    </div>
 
-<!-- Botón de regalo en su propio contenedor -->
-<div class="gift-container">
-  <button class="circle-button" title="Regalos" onclick="location.href='regalo.html'">
-    <span class="material-symbols-outlined">featured_seasonal_and_gifts</span>
-  </button>
-</div>
+    <!-- Botón de regalo en su propio contenedor -->
+    <div class="gift-container">
+      <button class="circle-button" title="Regalos" onclick="location.href='regalo.html'">
+        <span class="material-symbols-outlined">featured_seasonal_and_gifts</span>
+      </button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

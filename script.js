@@ -86,7 +86,6 @@ let currentQuestion = "";
 let changeCount = 0;
 const maxChangesBeforeMsg = 2;
 
-// Función para cargar una nueva pregunta aleatoria
 const loadRandomQuestion = () => {
   let newQuestion;
   do {
@@ -99,7 +98,6 @@ const loadRandomQuestion = () => {
   answerInput.value = "";
   answerInput.focus();
 
-  // Mostrar el mensaje si se cambió más de 2 veces
   if (changeCount > maxChangesBeforeMsg) {
     errorMessage.textContent = "¿Eres tonta o cotilla?";
   } else {
@@ -107,7 +105,6 @@ const loadRandomQuestion = () => {
   }
 };
 
-// Al hacer click en desbloquear
 unlockBtn.addEventListener("click", () => {
   popup.classList.add("hidden");
   questionPopup.classList.remove("hidden");
@@ -116,10 +113,8 @@ unlockBtn.addEventListener("click", () => {
   loadRandomQuestion();
 });
 
-// Validar respuesta
 submitAnswer.addEventListener("click", () => {
   const userAnswer = answerInput.value.trim().toLowerCase();
-
   const isCorrect =
     typeof currentAnswer === "string"
       ? userAnswer === currentAnswer
@@ -133,8 +128,38 @@ submitAnswer.addEventListener("click", () => {
   }
 });
 
-// Cambiar pregunta (sin límite, pero con mensaje)
 changeQuestionBtn.addEventListener("click", () => {
   changeCount++;
   loadRandomQuestion();
+});
+
+// ==========================
+// 🌟 Estrellas de fondo SOLO en sección
+// ==========================
+
+document.querySelectorAll(".custom-button .starry-background").forEach(container => {
+  const totalStars = 10; // cantidad por botón
+  for (let i = 0; i < totalStars; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.width = star.style.height = Math.random() * 3 + "px";
+    star.style.animationDelay = Math.random() * 3 + "s";
+    container.appendChild(star);
+  }
+});
+
+
+document.querySelectorAll(".custom-button .starry-background, .time-box .starry-background").forEach(container => {
+  const totalStars = 20; // menos para tarjetas pequeñas
+  for (let i = 0; i < totalStars; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+    star.style.top = Math.random() * 100 + "%";
+    star.style.left = Math.random() * 100 + "%";
+    star.style.width = star.style.height = Math.random() * 3 + "px";
+    star.style.animationDelay = Math.random() * 3 + "s";
+    container.appendChild(star);
+  }
 });

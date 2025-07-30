@@ -266,18 +266,20 @@ body {
 
 /* Estilo bonito para botones */
 .custom-button {
-  width: 220px;
-  padding: 14px 32px;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
   background-color: #1e293b;
-  color: #ffffff;
+  padding: 16px 32px; /* 💡 Aumentado */
+  color: #fff;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  width: 80%;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
+
 
 .custom-button:hover {
   background-color: #111827;
@@ -325,4 +327,90 @@ body {
 .gift-container .circle-button {
   animation: shake 1.2s ease-in-out infinite;
   animation-delay: 1.5s;
+}
+
+/* ==== Fondo con estrellas sutiles ==== */
+.star-section {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 20px;
+}
+
+.starry-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.4; }
+}
+
+.countdown-container,
+.button-container {
+  position: relative;
+  z-index: 1;
+}
+
+.custom-button .starry-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.2;
+  animation: twinkle 3s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.5; }
+}
+
+.custom-button span,
+.custom-button p {
+  position: relative;
+  z-index: 1;
+}
+
+
+.time-box {
+  position: relative;
+  overflow: hidden;
+  background-color: #1e293b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin: 5px 0;
+  z-index: 1;
+}
+
+.time-box .starry-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
