@@ -10,7 +10,7 @@
   <div class="container">
     <h1>¿Quieres ser mi novia?</h1>
 
-    <div class="buttons">
+    <div class="buttons" id="buttons-box">
       <button id="btn-si">SÍ</button>
       <button id="btn-no">NO</button>
     </div>
@@ -24,9 +24,11 @@
     const btnNo = document.getElementById('btn-no');
     const btnSi = document.getElementById('btn-si');
     const respuesta = document.getElementById('respuesta');
+    const buttonsBox = document.getElementById('buttons-box');
 
     let intentos = 0;
 
+    // El botón "NO" se mueve hasta 5 veces y luego desaparece
     btnNo.addEventListener('mouseover', () => {
       if (intentos < 5) {
         const randomX = Math.floor(Math.random() * 80);
@@ -40,8 +42,10 @@
       }
     });
 
+    // Al pulsar "SÍ": mostrar mensaje y ocultar ambos botones
     btnSi.addEventListener('click', () => {
       respuesta.classList.remove('hidden');
+      buttonsBox.classList.add('hidden');
     });
   </script>
 </body>
