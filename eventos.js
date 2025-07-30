@@ -122,3 +122,15 @@ function iniciarCuentaAtras(elemento, fechaObjetivo) {
     `;
   }, 1000);
 }
+
+// Inicializar cumpleaños fijos que están en el HTML
+window.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".countdown[data-date]").forEach(el => {
+    let targetDate = new Date(el.dataset.date);
+    const now = new Date();
+    if (targetDate < now) {
+      targetDate.setFullYear(now.getFullYear() + 1);
+    }
+    iniciarCuentaAtras(el, targetDate.getTime());
+  });
+});
