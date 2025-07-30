@@ -30,7 +30,7 @@ setInterval(updateCountdown, 1000);
 // 🖼️ Carrusel de imágenes
 // ==========================
 const imageElement = document.getElementById("carousel-image");
-const imageList = ["1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png"];
+const imageList = ["1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png", "10.png", "11.png"];
 let currentImageIndex = 0;
 
 setInterval(() => {
