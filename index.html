@@ -9,6 +9,16 @@
 </head>
 <body>
 
+  <div class="info-banner hidden" id="info-banner">
+    <div class="scroll-text">
+      ⚠️ Actualmente estamos en demanda pública por derechos de autor contra&nbsp;
+      <strong>Marta C*lleja Red...do</strong>, algunas de las funciones pueden estar afectadas. ⚠️
+    </div>
+  </div>
+
+
+
+
   <!-- Pop-up saludo + botón desbloqueo -->
   <div id="popup-message" class="popup">
     <p id="popup-text"></p>
@@ -34,7 +44,7 @@
     <!-- Imagen y cuenta atrás -->
     <div class="countdown-container">
       <div class="image-circle">
-        <img id="carousel-image" src="1.png" alt="Foto decorativa" />
+        <img id="carousel-image" src="/fotos/1.png" alt="Foto decorativa" />
       </div>
       <h1>Lily 🌸</h1>
       <div class="countdown">
@@ -59,7 +69,17 @@
           <span class="label">Segundos</span>
         </div>
       </div>
-      <img src="correr.png" alt="Corriendo" class="run-image">
+
+      <img src="/fotos/correr.png" alt="Corriendo" class="run-image">
+
+      <div class="float-card" id="phrase-card" aria-live="polite">
+        <span id="phrase-text">…</span>
+        <div class="phrase-progress">
+          <div class="progress-bar" id="progress-bar"></div>
+        </div>
+      </div>
+
+
     </div>
 
     <hr class="custom-separator">

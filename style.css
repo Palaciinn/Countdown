@@ -415,3 +415,131 @@ body {
   height: 100%;
   z-index: 0;
 }
+
+
+
+
+/* ===== Tarjeta flotante bajo la imagen de correr ===== */
+.float-card {
+  position: relative;
+  margin: 40px auto 0;
+  width: clamp(240px, 80vw, 520px);
+  background: rgba(255, 255, 255, 0.6);  /* blanco con opacidad */
+  color: #1e293b; /* gris oscuro */
+  border-radius: 20px;
+  padding: 14px 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  line-height: 1.4;
+  text-align: center;
+  backdrop-filter: blur(8px);  /* efecto glassmorphism */
+  -webkit-backdrop-filter: blur(8px); /* soporte Safari */
+  transition: all 0.3s ease;
+  font-style: italic;  /* ✅ texto en cursiva */
+}
+
+.float-card::before {
+  /* brillo suave diagonal */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 60% at 120% -20%, rgba(255,255,255,0.10), transparent 50%),
+              radial-gradient(60% 80% at -10% 120%, rgba(255,255,255,0.06), transparent 60%);
+  pointer-events: none;
+}
+
+#phrase-text {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+/* Animación “flotar” */
+@keyframes floaty {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Responsive fino */
+@media (max-width: 480px) {
+  #phrase-text { font-size: 0.98rem; }
+}
+
+/* === Barra de progreso dentro de la tarjeta === */
+.phrase-progress {
+  margin-top: 12px;
+  height: 5px;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  background-color: #1e293b;
+  animation: fillBar 60s linear infinite;
+}
+
+@keyframes fillBar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+
+/* ===== Banner de información superior animado con blur ===== */
+.info-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 40px; /* más alto que 34px */
+  background: rgba(255, 237, 237, 0.4); /* semitransparente */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  z-index: 9999;
+  display: none;
+  overflow: hidden;
+}
+
+.info-banner.show {
+  display: flex;
+  align-items: center;
+  animation: fadeDown 0.4s ease forwards;
+  padding: 0 6px; /* algo de respiro a los lados */
+}
+
+/* Texto desplazable centrado */
+.scroll-text {
+  display: flex;
+  align-items: center;     /* ✅ centra verticalmente */
+  height: 100%;            /* ocupa toda la altura del banner */
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: scroll-left 20s linear infinite;
+  font-style: italic;
+}
+
+.scroll-text strong {
+  margin-left: 5px; /* espacio después de "contra" */
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes fadeDown {
+  0% { transform: translateY(-100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+body {
+  padding-top: 42px; /* más espacio para nueva altura */
+}
+
+
+

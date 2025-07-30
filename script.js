@@ -30,7 +30,19 @@ setInterval(updateCountdown, 1000);
 // 🖼️ Carrusel de imágenes
 // ==========================
 const imageElement = document.getElementById("carousel-image");
-const imageList = ["1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png", "8.png", "9.png", "10.png", "11.png"];
+const imageList = [
+  "fotos/1.png",
+  "fotos/2.png",
+  "fotos/3.png",
+  "fotos/4.png",
+  "fotos/5.png",
+  "fotos/6.png",
+  "fotos/7.png",
+  "fotos/8.png",
+  "fotos/9.png",
+  "fotos/10.png",
+  "fotos/11.png"
+];
 let currentImageIndex = 0;
 
 setInterval(() => {
@@ -123,6 +135,13 @@ submitAnswer.addEventListener("click", () => {
   if (isCorrect) {
     questionPopup.classList.add("hidden");
     mainContent.classList.remove("blur");
+
+    // ✅ Mostrar banner con animación y blur
+    const infoBanner = document.getElementById("info-banner");
+    if (infoBanner) {
+      infoBanner.classList.add("show");
+    }
+
   } else {
     errorMessage.textContent = "Respuesta incorrecta. Intenta de nuevo.";
   }
@@ -163,3 +182,77 @@ document.querySelectorAll(".custom-button .starry-background, .time-box .starry-
     container.appendChild(star);
   }
 });
+
+
+
+
+// ==========================
+// 🗨️ Tarjeta flotante: frases que rotan cada minuto
+// ==========================
+(() => {
+  const phrases = [
+    "¿Lista para el abrazo más largo del mundo? Yo sí.",
+    "Pronto se acabarán los besos virtuales.",
+    "Espero que tu petete este listo para verme",
+    "No saques la lengua... Te estoy viendo",
+    "Creo que es una buena hora para que me llames",
+    "¡Mare que cosa!",
+    "¿Escuchas el avión?",
+    "Te mataré. (A besos)",
+    "¿Por qué siento que este contador no baja?",
+    "Echo de menos tu olor a choni",
+    "Amego, ¿tiene un segarro?",
+    "¿Por qué no jugamos un rato a algo?",
+    "¿Se te ocurre alguna función nueva? Mándamela en el feedback",
+    "Dia 234 intentando que Lily me llame pesado...",
+    "Yo no ronco, respiro fuerte",
+    "Ojala Marta y Lobato se casen",
+    "Elias, no me olvido de ti...",
+    "Deja de absorberme...",
+    "En una pelea entre Paco y Maya ¿Quién ganaría?",
+    "Debería estar besándote… y no programando",
+    "Ayer soñé con el amor de mi vida... Un GT3"
+  ];
+
+  const el = document.getElementById("phrase-text");
+  const card = document.getElementById("phrase-card");
+  if (!el || !card) return;
+
+  let lastIndex = -1;
+
+  const pickIndex = () => {
+    if (phrases.length === 1) return 0;
+    let i;
+    do { i = Math.floor(Math.random() * phrases.length); }
+    while (i === lastIndex);
+    lastIndex = i;
+    return i;
+  };
+
+  const setPhrase = () => {
+  const i = pickIndex();
+  // Pequeña transición de entrada/salida
+  card.style.opacity = 0;
+  card.style.transform = "translateY(-2px)";
+  setTimeout(() => {
+    el.textContent = `“${phrases[i]}”`; // ✅ Añade comillas decorativas
+    card.style.opacity = 1;
+    card.style.transform = "translateY(0)";
+
+    // ✅ Reiniciar barra de progreso
+    const bar = document.getElementById("progress-bar");
+    if (bar) {
+      bar.style.animation = "none";      // parar animación
+      bar.offsetHeight;                  // forzar reflow
+      bar.style.animation = "fillBar 60s linear forwards";
+    }
+  }, 180);
+};
+
+// Primera carga inmediata
+setPhrase();
+// Cambiar cada minuto
+setInterval(setPhrase, 60 * 1000);
+})();
+
+
