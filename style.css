@@ -7,7 +7,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  padding-bottom: 40px; /* añade espacio al final de toda la página */
+  padding-top: 40px; /* añade espacio al principio de toda la página */
   text-align: center;
 }
 
@@ -217,3 +218,89 @@ body {
   transform: rotate(90deg);
 }
 
+
+
+
+.run-image {
+  margin-top: 20px;
+  width: 220px;
+  height: auto;
+  animation: bounce 2s infinite;
+}
+
+/* Animación opcional para darle vida */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.funciones-image {
+  margin-top: 20px;
+  width: 220px;
+  height: auto;
+}
+
+
+.custom-separator {
+  margin-top: 60px;
+  border: none;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Contenedor de botones */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Más juntos entre sí */
+  margin-bottom: 40px; /* Espacio final */
+}
+
+/* Estilo bonito para botones */
+.custom-button {
+  width: 220px;
+  padding: 14px 32px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background-color: #1e293b;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-button:hover {
+  background-color: #111827;
+  transform: translateY(-1px);
+}
+
+.circle-button {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #1e293b;
+  color: #fff;
+  border: none;
+  font-size: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.circle-button:hover {
+  background-color: #334155;
+  transform: scale(1.05);
+}

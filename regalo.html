@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>¿Quieres ser mi novia?</title>
+  <link rel="stylesheet" href="regalocss.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>¿Quieres ser mi novia?</h1>
+
+    <div class="buttons">
+      <button id="btn-si">SÍ</button>
+      <button id="btn-no">NO</button>
+    </div>
+
+    <p id="respuesta" class="hidden">Esta función todavía no está disponible...<br>(Lo sabía) 😏</p>
+  </div>
+
+  <a href="index.html" class="floating-button">⬅ Volver</a>
+
+  <script>
+    const btnNo = document.getElementById('btn-no');
+    const btnSi = document.getElementById('btn-si');
+    const respuesta = document.getElementById('respuesta');
+
+    let intentos = 0;
+
+    btnNo.addEventListener('mouseover', () => {
+      if (intentos < 5) {
+        const randomX = Math.floor(Math.random() * 80);
+        const randomY = Math.floor(Math.random() * 80);
+        btnNo.style.position = 'absolute';
+        btnNo.style.top = `${randomY}%`;
+        btnNo.style.left = `${randomX}%`;
+        intentos++;
+      } else {
+        btnNo.style.display = 'none';
+      }
+    });
+
+    btnSi.addEventListener('click', () => {
+      respuesta.classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

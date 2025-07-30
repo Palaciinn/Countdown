@@ -1,0 +1,176 @@
+body {
+  margin: 0;
+  background-color: #f4c6d79c; /* Fondo del contador */
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 10px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.popup {
+  background-color: #1e293b;
+  padding: 30px 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  width: 70vw;
+  max-width: 400px;
+  margin: auto;
+  text-align: center;
+}
+
+.funny-text {
+  font-size: 1rem;
+  margin-bottom: 20px;
+  color: #facc15;
+}
+
+.question-text {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.popup input {
+  padding: 10px;
+  width: 80%;
+  border-radius: 8px;
+  border: none;
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+.popup button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #4ade80;
+  color: rgb(255, 255, 255);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.popup button:hover {
+  background-color: #22c55e;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: #f87171;
+  font-size: 0.9rem;
+}
+
+.main-content textarea {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  width: 100%;
+  resize: vertical;
+}
+
+.main-content button {
+  margin-top: 15px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: none;
+  background-color: #2563eb;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.main-content button:hover {
+  background-color: #1d4ed8;
+}
+
+.hidden {
+  display: none;
+}
+
+
+.main-content {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 40px 30px;
+  background-color: #1e293b;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  color: #fff;
+}
+
+.main-content h1 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #facc15;
+}
+
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feedback-form input,
+.feedback-form select,
+.feedback-form textarea {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+}
+
+.feedback-form button {
+  background-color: #22c55e;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.feedback-form button:hover {
+  background-color: #16a34a;
+}
+
+.hidden {
+  display: none;
+}
+
+
+
+
+.floating-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1e293b;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.floating-button:hover {
+  background-color: #334155;
+}
