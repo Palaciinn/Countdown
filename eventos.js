@@ -1,12 +1,12 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// Configuración de Supabase
-const supabase = createClient(
-  'https://bdgivulpjwzlnjgmwazm.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZ2l2dWxwand6bG5qZ213YXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODU4OTUsImV4cCI6MjA2OTQ2MTg5NX0.tWxMsaPa_4XHXJhZUpL_QKxxGYrkhCrI_L_qZr9ILsc'
-);
+// Configura tu Supabase
+const supabaseUrl = 'https://bdgivulpjwzlnjgmwazm.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZ2l2dWxwand6bG5qZ213YXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODU4OTUsImV4cCI6MjA2OTQ2MTg5NX0.tWxMsaPa_4XHXJhZUpL_QKxxGYrkhCrI_L_qZr9ILsc';
 
-// === Mostrar popup ===
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Mostrar popup para añadir evento
 document.getElementById("open-add-event").addEventListener("click", (e) => {
   e.preventDefault();
   document.getElementById("event-popup").classList.remove("hidden");
@@ -15,7 +15,7 @@ document.getElementById("close-popup").addEventListener("click", () => {
   document.getElementById("event-popup").classList.add("hidden");
 });
 
-// === Añadir evento ===
+// Añadir evento
 document.getElementById("add-event-btn").addEventListener("click", async () => {
   const title = document.getElementById("event-title").value.trim();
   const dateValue = document.getElementById("event-date").value;
@@ -25,99 +25,97 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
     return;
   }
 
-  let fixedDate = new Date(dateValue);
-  if (fixedDate < new Date()) fixedDate.setFullYear(new Date().getFullYear() + 1);
+  const fixedDate = new Date(dateValue);
+  const now = new Date();
+  if (fixedDate < now) {
+    fixedDate.setFullYear(now.getFullYear() + 1);
+  }
 
-  // ✅ Insert corregido usando bigint
+  // Insertar en Supabase
   const { data, error } = await supabase
     .from('eventos')
-    .insert([{ titulo: title, fecha: Number(fixedDate.getTime()), fijo: false }])
+    .insert([{ titulo: title, fecha: fixedDate.getTime(), fijo: false }])
     .select();
 
   if (error) {
-    console.error("Supabase insert error:", error);
-    alert("Error al guardar el evento: " + error.message);
+    console.error("🔴 Supabase insert error:", error);
+    alert("Error al guardar el evento: " + (error.message || JSON.stringify(error)));
     return;
   }
 
-  if (data && data.length > 0) {
-    crearCard(title, fixedDate, data[0].id);
-  }
+  console.log("✅ Evento guardado correctamente:", data);
 
-  document.getElementById("event-popup").classList.add("hidden");
+  // Mostrar en la interfaz
+  renderEvent({ titulo: title, fecha: fixedDate.getTime(), fijo: false });
+
   document.getElementById("event-title").value = "";
   document.getElementById("event-date").value = "";
+  document.getElementById("event-popup").classList.add("hidden");
 });
 
-// === Crear tarjeta de evento ===
-function crearCard(title, date, id) {
-  const list = document.getElementById("event-list");
+// Mostrar todos los eventos
+window.addEventListener("DOMContentLoaded", async () => {
+  const { data, error } = await supabase.from('eventos').select('*');
+  if (error) {
+    console.error("Error al cargar eventos:", error);
+    return;
+  }
+
+  data.forEach(evento => renderEvent(evento));
+});
+
+// Mostrar un evento con cuenta atrás
+function renderEvent(evento) {
+  const container = document.getElementById("event-list");
+  const fecha = new Date(evento.fecha);
   const card = document.createElement("div");
   card.className = "card";
-  card.innerHTML = `
-    <span class="delete-btn" title="Eliminar evento">🗑</span>
-    <h2>🎉 ${title}</h2>
-    <p class="date-note">${date.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
-    <div class="countdown"></div>
-  `;
-  list.appendChild(card);
-  iniciarCuentaAtras(card.querySelector(".countdown"), date.getTime());
 
-  // Eliminar evento
-  card.querySelector(".delete-btn").addEventListener("click", async () => {
-    const { error } = await supabase.from('eventos').delete().eq('id', id);
-    if (error) {
-      console.error("Supabase delete error:", error);
-      alert("Error al eliminar el evento");
-      return;
-    }
-    card.remove();
-  });
+  const isBirthday = evento.fijo;
+
+  card.innerHTML = `
+    <h2>${isBirthday ? "🎂" : "🎉"} ${evento.titulo}</h2>
+    <p class="date-note">${fecha.toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" })}</p>
+    <div class="countdown"></div>
+    ${!isBirthday ? `<button class="delete-btn">🗑️ Eliminar</button>` : ""}
+  `;
+
+  container.appendChild(card);
+  iniciarCuentaAtras(card.querySelector(".countdown"), fecha.getTime());
+
+  // Si no es cumpleaños, permitir eliminar
+  if (!isBirthday) {
+    card.querySelector(".delete-btn").addEventListener("click", async () => {
+      const { error } = await supabase.from('eventos').delete().eq('id', evento.id);
+      if (error) {
+        console.error("Error al eliminar:", error);
+        alert("Error al eliminar el evento");
+      } else {
+        card.remove();
+      }
+    });
+  }
 }
 
-// === Función cuenta atrás ===
+// Cuenta atrás
 function iniciarCuentaAtras(elemento, fechaObjetivo) {
-  const actualizar = () => {
+  const intervalo = setInterval(() => {
     const diff = fechaObjetivo - Date.now();
     if (diff <= 0) {
       elemento.innerHTML = `<span>¡Evento iniciado!</span>`;
+      clearInterval(intervalo);
       return;
     }
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
 
     elemento.innerHTML = `
-      <div><span class="num">${days}</span><span class="lbl">Días</span></div>
-      <div><span class="num">${hours}</span><span class="lbl">Horas</span></div>
-      <div><span class="num">${minutes}</span><span class="lbl">Min</span></div>
-      <div><span class="num">${seconds}</span><span class="lbl">Seg</span></div>
+      <div><span class="num">${d}</span><span class="lbl">Días</span></div>
+      <div><span class="num">${h}</span><span class="lbl">Horas</span></div>
+      <div><span class="num">${m}</span><span class="lbl">Min</span></div>
+      <div><span class="num">${s}</span><span class="lbl">Seg</span></div>
     `;
-  };
-  actualizar();
-  setInterval(actualizar, 1000);
+  }, 1000);
 }
-
-// === Cargar eventos desde Supabase ===
-async function cargarEventos() {
-  const { data, error } = await supabase.from('eventos').select('*').eq('fijo', false);
-  if (error) {
-    console.error("Supabase fetch error:", error);
-    return;
-  }
-  data.forEach(ev => {
-    const fecha = new Date(Number(ev.fecha));
-    if (fecha < new Date()) fecha.setFullYear(new Date().getFullYear() + 1);
-    crearCard(ev.titulo, fecha, ev.id);
-  });
-}
-
-cargarEventos();
-
-// === Inicializar cumpleaños existentes ===
-document.querySelectorAll(".countdown").forEach(el => {
-  let targetDate = new Date(el.dataset.date);
-  if (targetDate < new Date()) targetDate.setFullYear(new Date().getFullYear() + 1);
-  iniciarCuentaAtras(el, targetDate.getTime());
-});
