@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="kms.css" />
+  <title>¿A cuántos km estás de mí?</title>
+
+  <!-- Leaflet para el mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+<main>
+  <h1>¿A cuántos km estás de mí?</h1>
+  <p class="muted">Este cálculo se realiza en tu navegador usando la Geolocation API y la fórmula de Haversine. No se envían datos a ningún servidor.</p>
+
+  <div class="card">
+    <button id="btn-geo">Usar mi ubicación actual</button>
+    <button id="btn-retry" title="Reintentar geolocalización">Reintentar</button>
+    <p id="status" class="muted" style="margin-top:.5rem;">Permite el acceso a tu ubicación para calcular la distancia.</p>
+    <div id="result"></div>
+  </div>
+
+  <!-- Tarjeta del mapa (invisible al inicio) -->
+  <div id="map-card" class="card hidden">
+    <h3 style="margin-top:0;">Mapa</h3>
+    <div id="map" style="width: 100%; height: 250px; border-radius: 10px;"></div>
+  </div>
+</main>
+
+<a href="index.html" class="floating-button">⬅ Volver</a>
+
+<script>
+  const MI_POS = { lat: 41.661692271062776, lon: -0.857822701946288 }; // Tu ubicación fija (Zaragoza centro)
+
+  function haversineKm(lat1, lon1, lat2, lon2) {
+    const toRad = deg => deg * Math.PI / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) ** 2 +
+              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+              Math.sin(dLon/2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  const $status = document.getElementById('status');
+  const $result = document.getElementById('result');
+  const $btnGeo = document.getElementById('btn-geo');
+  const $btnRetry = document.getElementById('btn-retry');
+  const $mapCard = document.getElementById('map-card');
+  let mapInstance;
+
+  function showResult(userLat, userLon) {
+    const km = haversineKm(userLat, userLon, MI_POS.lat, MI_POS.lon);
+    const kmRounded = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 2 }).format(km);
+    const emoji = km > 10 ? '😢' : '😊';
+
+    $result.innerHTML = `
+      <div class="success">
+        <p><strong>Estás a ${kmRounded} km de mí. ${emoji}</strong></p>
+      </div>
+    `;
+    showMap(userLat, userLon);
+  }
+
+  function showError(message) {
+    $result.innerHTML = `<div class="error"><p><strong>No se pudo calcular:</strong> ${message}</p></div>`;
+  }
+
+  function getGeo() {
+    if (!('geolocation' in navigator)) {
+      $status.textContent = 'Tu navegador no soporta geolocalización.';
+      showError('Geolocalización no disponible.');
+      return;
+    }
+    $status.textContent = 'Solicitando permiso de ubicación…';
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude, accuracy } = pos.coords;
+        $status.textContent = `Ubicación obtenida (precisión ~${Math.round(accuracy)} m).`;
+        showResult(latitude, longitude);
+      },
+      (err) => {
+        let message = 'Error desconocido.';
+        if (err.code === err.PERMISSION_DENIED) message = 'Permiso denegado.';
+        if (err.code === err.POSITION_UNAVAILABLE) message = 'Ubicación no disponible.';
+        if (err.code === err.TIMEOUT) message = 'Tiempo de espera agotado.';
+        $status.textContent = message;
+        showError(message);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  }
+
+  function showMap(userLat, userLon) {
+    $mapCard.classList.remove('hidden');
+
+    if (!mapInstance) {
+  mapInstance = L.map('map').setView([userLat, userLon], 10);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://www.carto.com/">CARTO</a>',
+      subdomains: 'abcd',
+      maxZoom: 20
+     }).addTo(mapInstance);
+    } else {
+      mapInstance.setView([userLat, userLon], 10);
+    }
+
+    // Limpiar marcadores previos (menos el tile layer)
+    mapInstance.eachLayer((layer) => {
+      if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+        mapInstance.removeLayer(layer);
+      }
+    });
+
+    L.marker([userLat, userLon]).addTo(mapInstance).bindPopup('Tú estás aquí').openPopup();
+    L.marker([MI_POS.lat, MI_POS.lon]).addTo(mapInstance).bindPopup('Yo estoy aquí');
+    L.polyline([[userLat, userLon], [MI_POS.lat, MI_POS.lon]], { color: 'red' }).addTo(mapInstance);
+  }
+
+  $btnGeo.addEventListener('click', getGeo);
+  $btnRetry.addEventListener('click', getGeo);
+</script>
+</body>
+</html>
