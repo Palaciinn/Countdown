@@ -1,4 +1,4 @@
-:root{
+:root {
   --bg:#f7e8ee;
   --card:#ffffff;
   --text:#253046;
@@ -23,6 +23,7 @@ body{
   padding: 2rem 1rem 3rem;
 }
 
+
 .site-header{
   text-align:center;
 }
@@ -46,7 +47,7 @@ body{
 }
 
 .card{
-  background: #fff; /* fondo limpio */
+  background: #fff;
   border-radius: 16px;
   box-shadow: var(--shadow);
   padding: 1.25rem 1.25rem 1rem;
@@ -55,7 +56,7 @@ body{
 }
 
 .card::after{
-  content:none; /* eliminada la capa rosada */
+  content:none;
 }
 
 .card h2{
@@ -104,7 +105,12 @@ body{
   50%{ transform: translateY(-8px) }
 }
 
-.site-footer{ color:var(--muted); margin-top: .75rem; text-align:center; }
+.site-footer{
+  color:var(--muted);
+  margin-top: .75rem;
+  text-align:center;
+  padding-bottom: 40px; /* añade un poco de aire interno */
+}
 
 /* Botón flotante "Volver" */
 .floating-button {
@@ -121,7 +127,7 @@ body{
   display: inline-flex;
   align-items: center;
   transition: background-color 0.3s ease;
-  z-index: 1000; /* asegurar que queda por encima */
+  z-index: 1000;
 }
 
 .floating-button:hover {
@@ -130,7 +136,7 @@ body{
 
 /* Botón flotante para añadir evento */
 .add-event-btn {
-  bottom: 70px; /* lo coloca justo encima del botón Volver */
+  bottom: 70px;
   background-color: #ff8fb1;
   width: 48px;
   height: 48px;
@@ -234,4 +240,24 @@ body{
 
 .delete-btn:hover {
   background-color: #ff5a8b;
+}
+
+
+.custom-separator {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  border: none;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.8); /* Ajusta opacidad/color según fondo */
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 12px;
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  color: var(--text);
 }
