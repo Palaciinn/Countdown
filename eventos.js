@@ -31,11 +31,14 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
     fixedDate.setFullYear(now.getFullYear() + 1);
   }
 
-  // Insertar en Supabase
+  // Insertar en Supabase (fecha como string para bigint)
   const { data, error } = await supabase
     .from('eventos')
-    .insert([{ titulo: title, fecha: fixedDate.getTime(), fijo: false }])
-    .select();
+    .insert([{ 
+      titulo: String(title), 
+      fecha: String(fixedDate.getTime()), 
+      fijo: false 
+    }]);
 
   if (error) {
     console.error("🔴 Supabase insert error:", error);
@@ -67,7 +70,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 // Mostrar un evento con cuenta atrás
 function renderEvent(evento) {
   const container = document.getElementById("event-list");
-  const fecha = new Date(evento.fecha);
+  const fecha = new Date(Number(evento.fecha));
   const card = document.createElement("div");
   card.className = "card";
 
