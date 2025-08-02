@@ -31,9 +31,25 @@ const SESSION_KEY = "playerSession";
 const SESSION_WINDOW_MS = 2 * 60 * 60 * 1000; // 2h
 
 // Alias por compatibilidad (en caso de que en otro archivo se lea UNLOCK_WINDOW_MS)
-const UNLOCK_WINDOW_MS = SESSION_WINDOW_MS;
+export const UNLOCK_WINDOW_MS = SESSION_WINDOW_MS;
 
 const ALIGN_UNLOCK_WITH_SESSION = false; // ⛔ no tocar 'unlockUntilTs'
+
+// ==========================
+// 🔁 Post-login redirect
+// ==========================
+const REDIRECT_KEY = "postLoginRedirect";
+
+// Evita open-redirects: solo acepta misma origin
+function sanitizeNextUrl(next, fallback = "index.html") {
+  try {
+    const u = new URL(next, location.origin);
+    if (u.origin === location.origin) {
+      return u.pathname + u.search + u.hash;
+    }
+  } catch {}
+  return fallback;
+}
 
 export function getCurrentPlayer() {
   try {
@@ -85,10 +101,17 @@ export function logout() {
   // ❌ No borrar 'unlockUntilTs' aquí
 }
 
-export function requireAuth({ redirectTo = "login.html" } = {}) {
+// ✅ Nueva versión: recuerda a dónde quería ir el usuario y añade ?next=...
+export function requireAuth({ redirectTo = "login.html", rememberNext = true } = {}) {
   const s = getCurrentPlayer();
   if (!s) {
-    window.location.href = redirectTo;
+    const next = location.pathname + location.search + location.hash;
+    if (rememberNext) {
+      try { localStorage.setItem(REDIRECT_KEY, next); } catch {}
+    }
+    const url = new URL(redirectTo, location.origin);
+    if (rememberNext) url.searchParams.set("next", next);
+    window.location.href = url.toString();
     return null;
   }
   return s;
@@ -97,6 +120,22 @@ export function requireAuth({ redirectTo = "login.html" } = {}) {
 export function currentPlayerName() {
   const s = getCurrentPlayer();
   return s ? s.name : null; // 'angel' | 'lily' | null
+}
+
+// ✅ Llamar tras login/registro correcto para volver a la página original
+export function consumePostLoginRedirect(defaultUrl = "index.html") {
+  const params = new URLSearchParams(location.search);
+  let next = params.get("next");
+
+  if (!next) {
+    try { next = localStorage.getItem(REDIRECT_KEY); } catch {}
+  }
+
+  const safeNext = sanitizeNextUrl(next, defaultUrl);
+  try { localStorage.removeItem(REDIRECT_KEY); } catch {}
+
+  // replace() para no dejar el login en el historial
+  window.location.replace(safeNext);
 }
 
 // ==========================
@@ -159,7 +198,7 @@ export async function loginPlayer({ name, passphrase }) {
     if (msLeft > 0) {
       setTimeout(() => {
         clearSession();
-        try { localStorage.removeItem("unlockUntilTs"); } catch {}
+        // ❌ No tocar 'unlockUntilTs' aquí
         // location.reload(); // opcional
       }, msLeft);
     }

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>3 en raya</title>
+
+  <!-- Material Symbols: circle y close -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&icon_names=circle,close" />
+
+  <style>
+    :root{
+      --angel:#2563eb; /* Azul Angel */
+      --lily:#ec4899;  /* Rosa Lily  */
+      --board-bg:#0f172a;
+      --tile:#111827;
+      --tile-border:#1f2937;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --accent:#22c55e;
+      --danger:#ef4444;
+      --warn:#f59e0b;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#0b1220,#0f172a 20%,#0f172a);
+      color:var(--text); display:flex; min-height:100vh; align-items:center; justify-content:center; padding:16px;
+    }
+    .wrap{ width:min(680px,92vw); display:grid; gap:16px; }
+    header{ display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    h1{ margin:0; font-size:clamp(20px,3.6vw,28px) }
+    .scoreboard{ display:flex; gap:12px; flex-wrap:wrap; align-items:center }
+    .badge{
+      background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:8px 12px; display:flex; gap:8px; align-items:center;
+    }
+    .dot{ width:10px; height:10px; border-radius:50% }
+    .dot.angel{ background:var(--angel) }
+    .dot.lily{  background:var(--lily)  }
+    .score{ font-weight:700 }
+    .status{
+      background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:10px 12px; color:var(--muted)
+    }
+    /* Transición suave para el glow */
+    .status{
+        /* ...lo que ya tienes... */
+        transition: box-shadow .25s ease, border-color .25s ease, color .2s ease;
+    }
+
+    /* Glow azul cuando es turno de Angel */
+    .status.glow-angel{
+        border-color: rgba(37,99,235,.55);
+        box-shadow:
+        0 0 0 1px rgba(37,99,235,.35),
+        0 0 18px 2px rgba(37,99,235,.35),
+        inset 0 0 0 1px rgba(37,99,235,.15);
+        text-shadow: 0 0 8px rgba(37,99,235,.5);
+    }
+
+    /* Glow rosa cuando es turno de Lily */
+    .status.glow-lily{
+        border-color: rgba(236,72,153,.55);
+        box-shadow:
+        0 0 0 1px rgba(236,72,153,.35),
+        0 0 18px 2px rgba(236,72,153,.35),
+        inset 0 0 0 1px rgba(236,72,153,.15);
+        text-shadow: 0 0 8px rgba(236,72,153,.5);
+    }
+
+
+    .session{
+      background:#0b1220; border:1px solid #1f2937; border-radius:12px; padding:8px 12px; color:var(--text)
+    }
+
+    .board{
+      aspect-ratio:1/1; background:var(--board-bg); border-radius:20px; padding:14px;
+      display:grid; grid-template-columns:repeat(3,1fr); gap:10px; border:1px solid #1f2937;
+      box-shadow:0 10px 30px rgba(0,0,0,.25); user-select:none;
+    }
+    .cell{
+      background:var(--tile); border:1px solid var(--tile-border); border-radius:16px;
+      display:grid; place-items:center; cursor:pointer;
+      transition: transform .08s ease, border-color .15s ease, background .2s ease;
+      font-size: clamp(38px, 8.2vw, 72px); line-height:1; padding:6px;
+    }
+    .cell:hover{ transform: translateY(-1px); border-color:#273449 }
+    .cell:active{ transform: translateY(0) scale(.99) }
+    .cell.disabled{ cursor:default; opacity:.85 }
+    .cell .material-symbols-outlined{ font-variation-settings: 'OPSZ' 48, 'wght' 600, 'FILL' 0, 'GRAD' 0; }
+    .angel .material-symbols-outlined{ color:var(--angel) }
+    .lily  .material-symbols-outlined{ color:var(--lily) }
+    .win{ outline:3px solid var(--accent); box-shadow: inset 0 0 0 2px rgba(255,255,255,.05); }
+
+    .controls{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between; }
+    .left, .right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
+    button{
+      border:1px solid #1f2937; background:#0b1220; color:var(--text);
+      padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:600;
+      transition: background .15s ease, transform .05s ease, border-color .15s ease;
+    }
+    button:hover{ background:#0f1b33; border-color:#263246 }
+    button:active{ transform: scale(.98) }
+    .primary{ background:#122543; border-color:#1c3562 }
+    .primary:hover{ background:#16305a; border-color:#234375 }
+    .danger{ border-color:#3b1111 }
+    .danger:hover{ background:#2a0b0b }
+
+    footer{ color:var(--muted); font-size:.9rem }
+    .legend{ display:flex; gap:14px; align-items:center; flex-wrap:wrap }
+    .legend .it{ display:flex; gap:6px; align-items:center }
+    .legend .material-symbols-outlined{ font-size:22px; line-height:1 }
+
+    /* === Botón "Volver a inicio" === */
+    .back-home-btn{
+      display: flex;
+      width: max-content;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      margin-top: 20px;     /* un poco de aire respecto al bloque anterior */
+      margin: 20px auto 0;    /* auto en los lados = centrado */
+    }
+
+
+    .back-home-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 12px 22px rgba(0,0,0,.35);
+    }
+    .back-home-btn:active{
+      transform: translateY(0);
+      opacity: .95;
+    }
+
+    @media (max-width:420px){ .cell{ font-size:54px } }
+    
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="scoreboard">
+        <div class="badge"><span class="dot angel"></span> Angel: <span id="scoreAngel" class="score">0</span></div>
+        <div class="badge"><span class="dot lily"></span> Lily: <span id="scoreLily" class="score">0</span></div>
+        <div class="session" id="sessionInfo">Jugando como: —</div>
+        <div class="status" id="status">Conectando…</div>
+      </div>
+    </header>
+
+    <div id="board" class="board" aria-label="Tablero 3 en raya">
+      <button class="cell" data-idx="0" aria-label="celda 1"></button>
+      <button class="cell" data-idx="1" aria-label="celda 2"></button>
+      <button class="cell" data-idx="2" aria-label="celda 3"></button>
+      <button class="cell" data-idx="3" aria-label="celda 4"></button>
+      <button class="cell" data-idx="4" aria-label="celda 5"></button>
+      <button class="cell" data-idx="5" aria-label="celda 6"></button>
+      <button class="cell" data-idx="6" aria-label="celda 7"></button>
+      <button class="cell" data-idx="7" aria-label="celda 8"></button>
+      <button class="cell" data-idx="8" aria-label="celda 9"></button>
+    </div>
+
+    <div class="controls">
+      <div class="left legend">
+        <div class="it"><span class="material-symbols-outlined">close</span> = Angel</div>
+        <div class="it"><span class="material-symbols-outlined">circle</span> = Lily</div>
+      </div>
+      <div class="right">
+        <button id="btnNew" class="primary" disabled>➡️ Nueva partida</button>
+        <button id="btnReset" class="danger">🗑️ Reiniciar marcador</button>
+      </div>
+    </div>
+
+    <footer>
+      Reglas: solo mueve quien tiene el turno. La siguiente partida la empieza quien <strong>perdió</strong>. En empate, empieza quien <strong>no</strong> empezó la anterior.
+          <!-- Botón Volver a inicio -->
+          <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
+    </footer>
+  </div>
+
+  <!-- auth.js + Supabase realtime -->
+<script type="module">
+  import { requireAuth, currentPlayerName } from './auth.js';
+  import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+  // ====== Supabase (tus claves) ======
+  const SUPABASE_URL = "https://bdgivulpjwzlnjgmwazm.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZ2l2dWxwand6bG5qZ213YXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODU4OTUsImV4cCI6MjA2OTQ2MTg5NX0.tWxMsaPa_4XHXJhZUpL_QKxxGYrkhCrI_L_qZr9ILsc";
+
+  // ====== Sala por querystring (p.ej. ?room=angel-lily) ======
+  const params = new URLSearchParams(location.search);
+  const ROOM_CODE = params.get('room') || 'angel-lily';
+
+  // ====== Login de tu app ======
+  requireAuth(); // redirige si no hay sesión
+  const who = (currentPlayerName() || '').toLowerCase(); // 'angel' | 'lily'
+  const mySide = (who === 'angel') ? 'A' : 'L';
+
+  // ====== Supabase client ======
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ====== UI helpers ======
+  const ANGEL = { name: 'Angel', icon: 'close', className:'angel' };
+  const LILY  = { name: 'Lily',  icon: 'circle', className:'lily'  };
+  const P = s => s==='A' ? ANGEL : LILY;
+
+  const boardEl = document.getElementById('board');
+  const statusEl = document.getElementById('status');
+  const scoreAngelEl = document.getElementById('scoreAngel');
+  const scoreLilyEl  = document.getElementById('scoreLily');
+  const btnNew = document.getElementById('btnNew');
+  const btnReset = document.getElementById('btnReset');
+  const sessionInfoEl = document.getElementById('sessionInfo');
+  sessionInfoEl.textContent = `Jugando como: ${who === 'angel' ? 'Angel' : 'Lily'}`;
+
+  function iconSpan(name){
+    const s=document.createElement('span');
+    s.className='material-symbols-outlined';
+    s.textContent=name;
+    return s;
+  }
+  function setStatus(t){ statusEl.textContent = t; }
+
+  // === GLOW del estado según turno ===
+  function setTurnGlowBySide(side){
+    statusEl.classList.remove('glow-angel','glow-lily');
+    if(side === 'A') statusEl.classList.add('glow-angel');
+    else if(side === 'L') statusEl.classList.add('glow-lily');
+  }
+
+  function paintBoard(state){
+    boardEl.querySelectorAll('.cell').forEach((c,i)=>{
+      c.innerHTML=''; c.className='cell'; c.removeAttribute('aria-disabled');
+      const v = state.board[i];
+      if(v==='A' || v==='L'){
+        c.classList.add(P(v).className,'disabled');
+        c.setAttribute('aria-disabled','true');
+        c.appendChild(iconSpan(P(v).icon));
+      }
+    });
+  }
+  function updateScoresUI(s){
+    scoreAngelEl.textContent = s.scores_a;
+    scoreLilyEl.textContent  = s.scores_l;
+  }
+
+  function updateTurnStatus(s){
+    if(s.finished){
+      if(s.winner==='A' || s.winner==='L'){
+        setStatus(`${P(s.winner).name} gana 🎉`);
+        setTurnGlowBySide(s.winner);       // opcional: brillo del ganador
+      }else{
+        setStatus(`Empate 🤝`);
+        statusEl.classList.remove('glow-angel','glow-lily'); // sin glow en empate
+      }
+      btnNew.disabled = false;
+    }else{
+      setStatus(`Turno de ${P(s.current).name}`);
+      setTurnGlowBySide(s.current);        // brillo según turno
+      btnNew.disabled = true;
+    }
+  }
+
+  // ====== Estado espejo del servidor ======
+  let match = null;
+
+  // 1) Obtener o crear la partida por code
+  async function getOrCreateMatch(){
+    let { data, error } = await supabase
+      .from('ttt_matches')
+      .select('*')
+      .eq('code', ROOM_CODE)
+      .maybeSingle();
+    if(error) throw error;
+
+    if(!data){
+      const { data: created, error: err2 } = await supabase
+        .from('ttt_matches')
+        .insert({ code: ROOM_CODE })
+        .select('*')
+        .single();
+      if(err2) throw err2;
+      data = created;
+    }
+    return data;
+  }
+
+  // 2) Suscripción Realtime a la fila
+  function subscribeMatch(id){
+    const channel = supabase.channel(`ttt:${id}`)
+      .on(
+        'postgres_changes',
+        { event:'*', schema:'public', table:'ttt_matches', filter:`id=eq.${id}` },
+        payload => { match = payload.new; render(); }
+      )
+      .subscribe();
+    return channel;
+  }
+
+  function render(){
+    if(!match) return;
+    paintBoard(match);
+    updateScoresUI(match);
+    updateTurnStatus(match);
+  }
+
+  // 3) Movimiento atómico (servidor valida turno)
+  async function tryMove(cellIdx){
+    if(!match || match.finished) return;
+
+    if(match.current !== mySide){
+      setStatus(`Es turno de ${P(match.current).name}`);
+      setTurnGlowBySide(match.current); // aplicar glow del que tiene el turno
+      return;
+    }
+
+    const { data, error } = await supabase.rpc('ttt_do_move', {
+      p_code: ROOM_CODE, p_idx: cellIdx+1, p_side: mySide
+    });
+    if(error){
+      // Mensajes típicos: Not your turn, Cell occupied, etc.
+      if(error.message?.includes('Not your turn')){
+        setStatus(`Es turno de ${P(match.current).name}`);
+        setTurnGlowBySide(match.current);
+      }else{
+        setStatus(`⚠️ ${error.message}`);
+      }
+      return;
+    }
+    match = data; render(); // realtime también actualizará
+  }
+
+  async function newGame(){
+    const { data, error } = await supabase.rpc('ttt_new_game', { p_code: ROOM_CODE });
+    if(error){ console.error(error); return; }
+    match = data; render();
+  }
+  async function resetScores(){
+    if(!confirm('¿Reiniciar el marcador de victorias?')) return;
+    const { data, error } = await supabase.rpc('ttt_reset_scores', { p_code: ROOM_CODE });
+    if(error){ console.error(error); return; }
+    match = data; render();
+  }
+
+  // Eventos UI
+  boardEl.querySelectorAll('.cell').forEach(c=>{
+    c.addEventListener('click', e=>{
+      const idx = Number(e.currentTarget.dataset.idx);
+      tryMove(idx);
+    });
+  });
+  btnNew.addEventListener('click', newGame);
+  btnReset.addEventListener('click', resetScores);
+
+  // Init
+  (async ()=>{
+    try{
+      statusEl.classList.remove('glow-angel','glow-lily'); // limpia glow al iniciar
+      setStatus('Conectando…');
+      const m = await getOrCreateMatch();
+      match = m; render();
+      subscribeMatch(m.id);
+    }catch(err){
+      console.error(err);
+      setStatus('Error conectando. Revisa la consola.');
+      statusEl.classList.remove('glow-angel','glow-lily');
+    }
+  })();
+</script>
+</body>
+</html>

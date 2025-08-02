@@ -293,87 +293,89 @@
   </div>
 
   <script type="module">
-    import { loginPlayer } from './auth.js';
+  import { loginPlayer, consumePostLoginRedirect } from './auth.js';
 
-    const cards = document.querySelectorAll('.card');
+  const cards = document.querySelectorAll('.card');
 
-    function activateCard(card){
-      cards.forEach(c => {
-        if (c === card) {
-          c.classList.add('active');
-          c.querySelector('.pass')?.focus();
-          c.querySelector('.msg').textContent = '';
-        } else {
-          c.classList.remove('active');
-          c.querySelector('.msg').textContent = '';
-        }
-      });
-    }
-
-    // Click o Enter para activar tarjeta
-    cards.forEach(card => {
-      card.addEventListener('click', () => activateCard(card));
-      card.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          activateCard(card);
-        }
-      });
-
-      // Submit dentro de la tarjeta
-      const btn = card.querySelector('.btn');
-      const input = card.querySelector('.pass');
-      const msg = card.querySelector('.msg');
-
-      async function submitCard(){
-        msg.classList.remove('ok','err');
-        msg.textContent = '';
-        const name = card.dataset.name;               // 'angel' | 'lily'
-        const pass = (input.value || '').trim();
-
-        if (!pass) {
-          msg.classList.add('err');
-          msg.textContent = 'Contraseña';
-          input.focus();
-          return;
-        }
-
-        btn.disabled = true;
-        btn.textContent = 'Entrando...';
-
-        try {
-          await loginPlayer({ name, passphrase: pass });
-          msg.classList.add('ok');
-          msg.textContent = 'Sesión iniciada. Redirigiendo...';
-          setTimeout(() => location.href = 'index.html', 600);
-        } catch (err) {
-          msg.classList.add('err');
-          msg.textContent = err?.message || 'Error al iniciar sesión';
-          btn.disabled = false;
-          btn.textContent = 'Entrar';
-          input.select();
-        }
+  function activateCard(card){
+    cards.forEach(c => {
+      if (c === card) {
+        c.classList.add('active');
+        c.querySelector('.pass')?.focus();
+        c.querySelector('.msg').textContent = '';
+      } else {
+        c.classList.remove('active');
+        c.querySelector('.msg').textContent = '';
       }
+    });
+  }
 
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        submitCard();
-      });
-
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          submitCard();
-        }
-        e.stopPropagation();
-      });
+  // Click o Enter para activar tarjeta
+  cards.forEach(card => {
+    card.addEventListener('click', () => activateCard(card));
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        activateCard(card);
+      }
     });
 
-    // Activar por defecto la primera tarjeta en pantallas grandes
-    if (window.matchMedia('(min-width: 721px)').matches) {
-      const first = document.querySelector('.card');
-      if (first) activateCard(first);
+    // Submit dentro de la tarjeta
+    const btn = card.querySelector('.btn');
+    const input = card.querySelector('.pass');
+    const msg = card.querySelector('.msg');
+
+    async function submitCard(){
+      msg.classList.remove('ok','err');
+      msg.textContent = '';
+      const name = card.dataset.name;               // 'angel' | 'lily'
+      const pass = (input.value || '').trim();
+
+      if (!pass) {
+        msg.classList.add('err');
+        msg.textContent = 'Contraseña';
+        input.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+
+      try {
+        await loginPlayer({ name, passphrase: pass });
+        msg.classList.add('ok');
+        msg.textContent = 'Sesión iniciada. Redirigiendo...';
+        // ⬇️ Volver a la página que el usuario quería (o a index.html como fallback)
+        consumePostLoginRedirect('index.html');
+      } catch (err) {
+        msg.classList.add('err');
+        msg.textContent = err?.message || 'Error al iniciar sesión';
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        input.select();
+      }
     }
-  </script>
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      submitCard();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitCard();
+      }
+      e.stopPropagation();
+    });
+  });
+
+  // Activar por defecto la primera tarjeta en pantallas grandes
+  if (window.matchMedia('(min-width: 721px)').matches) {
+    const first = document.querySelector('.card');
+    if (first) activateCard(first);
+  }
+</script>
+  
 </body>
 </html>
