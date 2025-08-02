@@ -1,3 +1,7 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* Base de la página */
 body{
   margin: 0;
@@ -101,7 +105,7 @@ body{
   font-size: 1.1rem;
   z-index: 9999;
   text-align: center;
-  width: 75vw;         /* 👈 ocupa el 80% del viewport */
+  width: 90vw;         /* 👈 ocupa el 80% del viewport */
   max-width: 400px;    /* 👈 nunca más de 400px */
 }
 
