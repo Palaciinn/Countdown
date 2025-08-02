@@ -8,8 +8,8 @@
   <style>
     :root{
       --bg: #0b0f1a;
-      --panel: rgba(255,255,255,.06);
-      --border: rgba(255,255,255,.12);
+      --panel: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.12);
       --text: #e5e7eb;
       --muted:#9ca3af;
       --primary:#2563eb;
@@ -28,7 +28,7 @@
         var(--bg);
       display:grid; place-items:center; padding:24px;
     }
-    /* Móvil: fondo liso (sin franja) */
+    /* Móvil: fondo liso */
     @media (max-width: 600px){
       body{ background: var(--bg); }
     }
@@ -42,7 +42,7 @@
       border:1px solid var(--border);
       border-radius:18px;
       background:var(--panel);
-      box-shadow:0 12px 26px rgba(0,0,0,.28);
+      box-shadow:0 12px 26px rgba(0,0,0,0.28);
       padding:18px;
     }
 
@@ -58,57 +58,57 @@
         justify-items:center; text-align:center;
       }
       /* Solo ampliamos el bloque de contenido, no el avatar */
-      .profile > div:not(.avatar-wrap){ width:100%; }
+      .profile > div:not(.avatar-block){ width:100%; }
       .card{ padding:16px; }
     }
 
+    /* ===== Avatar + barra de acciones (Opción A) ===== */
+    .avatar-block{ display:grid; justify-items:center; gap:10px; }
     .avatar-wrap{
       position:relative;
       width: clamp(96px, 28vw, 128px);
       aspect-ratio: 1 / 1;
       border-radius:50%;
       overflow:hidden;
-      border:2px solid rgba(255,255,255,.18);
-      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+      border:2px solid rgba(255,255,255,0.18);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
       background:#111827;
     }
     .avatar-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-    .avatar-btn{
-      position:absolute; bottom:6px;
-      display:inline-flex; align-items:center; justify-content:center;
-      width:36px; height:36px; border-radius:10px;
-      border:1px solid var(--border);
-      color:#fff; cursor:pointer;
-      box-shadow:0 6px 14px rgba(0,0,0,.35);
-      transition:transform .12s ease, background .2s ease, opacity .2s ease;
+    .avatar-toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
     }
-    /* Botón cámara (derecha) */
-    #changePhoto.avatar-btn{ right:6px; background:rgba(0,0,0,.45); }
-    #changePhoto.avatar-btn:hover{ transform:translateY(-1px); background:rgba(0,0,0,.6); }
-    /* Botón quitar (izquierda) */
-    #removePhoto.avatar-btn{ left:6px; background:rgba(239,68,68,.65); }
-    #removePhoto.avatar-btn:hover{ transform:translateY(-1px); background:rgba(239,68,68,.85); }
+    .avatar-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:999px; border:1px solid var(--border);
+      background: rgba(255,255,255,.08); color:#fff; cursor:pointer;
+      box-shadow:0 6px 14px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .2s ease, opacity .2s ease, box-shadow .2s ease;
+      font-weight:600;
+    }
+    .avatar-pill:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,.12);
+      box-shadow:0 10px 20px rgba(0,0,0,.35);
+    }
+    .avatar-pill--danger{
+      background: rgba(239,68,68,.16);
+      border-color: rgba(239,68,68,.35);
+    }
+    .avatar-pill--danger:hover{ background: rgba(239,68,68,.24); }
+    @media (max-width:640px){
+      .avatar-toolbar{ width:100%; justify-content:center; }
+    }
 
     .identity h2{ margin:.2rem 0 .4rem 0; font-size:1.3rem; }
-
-    /* Solo “Cumpleaños” */
-    .facts{
-      display:grid; gap:6px;
-      margin: 8px 0 14px 0;
-      text-align:left;
-    }
-    @media (max-width:640px){ .facts{ text-align:left; } }
-    .fact{ display:flex; gap:8px; }
-    .fact .label{ font-weight:800; min-width:110px; color:#dbeafe; }
-    .fact .value{ color:var(--text); }
 
     .bio{ display:grid; gap:8px; }
     .bio textarea{
       width:100%;
       min-height:96px; resize:vertical;
       border-radius:12px; border:1px solid var(--border);
-      background:rgba(255,255,255,.08); color:var(--text);
+      background:rgba(255,255,255,0.08); color:var(--text);
       padding:12px 14px; outline:none;
       margin-top: 20px;
       margin-bottom: 10px;
@@ -118,10 +118,10 @@
     .save-btn{
       appearance:none; border:none; border-radius:12px; padding:10px 14px;
       font-weight:700; color:#fff; background:linear-gradient(135deg, #2563eb, #60a5fa);
-      box-shadow: 0 10px 22px rgba(37,99,235,.35);
+      box-shadow: 0 10px 22px rgba(37,99,235,0.35);
       cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
     }
-    .save-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(37,99,235,.45); }
+    .save-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(37,99,235,0.45); }
     .save-btn:active{ transform:none; opacity:.95; }
     .msg{ margin:0; min-height:1.2em; font-size:.95rem; color:var(--muted); }
     .msg.ok{ color:var(--ok); }
@@ -138,13 +138,13 @@
       .life-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } /* más ancho: 3 */
     }
     .metric{
-      background:rgba(255,255,255,.08);
+      background:rgba(255,255,255,0.08);
       border:1px solid var(--border);
       border-radius:16px;
       padding:12px;
       display:grid; gap:4px; justify-items:center;
       min-height:80px;
-      box-shadow: 0 6px 14px rgba(0,0,0,.25);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
     }
     .metric .num{
       font-size: clamp(1.2rem, 5.5vw, 1.6rem);
@@ -153,12 +153,11 @@
       font-variant-numeric: tabular-nums;
     }
     .metric .lab{ font-size:.9rem; color:var(--muted); }
-    /* Segundos ancho */
     .metric--wide{ grid-column: 1 / -1; }
     .metric--wide .num{ font-size: clamp(1.6rem, 7vw, 2.2rem); }
     .metric--wide .lab{ font-size: 1rem; }
 
-    /* === Botón "Volver a inicio" (igual que en login/register) === */
+    /* === Botón "Volver a inicio" === */
     .back-home-btn{
       display: inline-flex;
       align-items: center;
@@ -170,20 +169,20 @@
       color: var(--text);
       text-decoration: none;
       font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
       transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
     }
     .back-home-btn:hover{
       transform: translateY(-1px);
       background: rgba(255,255,255,0.12);
-      box-shadow: 0 12px 22px rgba(0,0,0,.35);
+      box-shadow: 0 12px 22px rgba(0,0,0,0.35);
     }
     .back-home-btn:active{
       transform: translateY(0);
       opacity: .95;
     }
 
-    /* Fila de acciones (no sustituye nada; solo organiza ambos botones) */
+    /* Fila de acciones (volver + logout) */
     .actions-row{
       display:flex;
       gap:12px;
@@ -196,16 +195,14 @@
     .actions-row .logout-btn{
       display:inline-flex; align-items:center; justify-content:center;
     }
-
-    /* Botón cerrar sesión (ya lo tenías) */
     .logout-btn{
       appearance:none; border:none; border-radius:12px;
       padding:12px 16px; font-weight:700; color:#fff;
       background:linear-gradient(135deg, #ef4444, #f97316);
-      box-shadow: 0 10px 22px rgba(239,68,68,.35);
+      box-shadow: 0 10px 22px rgba(239,68,68,0.35);
       cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
     }
-    .logout-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(239,68,68,.45); }
+    .logout-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(239,68,68,0.45); }
     .logout-btn:active{ transform:none; opacity:.95; }
   </style>
 </head>
@@ -216,17 +213,23 @@
 
     <!-- Perfil -->
     <section class="card profile">
-      <div class="avatar-wrap">
-        <img id="avatar" alt="Foto de perfil" />
-        <!-- Botón quitar foto -->
-        <button id="removePhoto" class="avatar-btn" title="Quitar foto" aria-label="Quitar foto">
-          <span class="material-symbols-outlined">delete</span>
-        </button>
-        <!-- Botón cambiar foto -->
-        <button id="changePhoto" class="avatar-btn" title="Cambiar foto" aria-label="Cambiar foto">
-          <span class="material-symbols-outlined">photo_camera</span>
-        </button>
-        <input id="photoInput" type="file" accept="image/*" hidden />
+      <!-- Opción A: avatar + toolbar inferior -->
+      <div class="avatar-block">
+        <div class="avatar-wrap">
+          <img id="avatar" alt="Foto de perfil" />
+        </div>
+
+        <div class="avatar-toolbar" role="group" aria-label="Acciones de foto">
+          <button id="changePhoto" class="avatar-pill">
+            <span class="material-symbols-outlined">photo_camera</span>
+            Cambiar
+          </button>
+          <button id="removePhoto" class="avatar-pill avatar-pill--danger">
+            <span class="material-symbols-outlined">delete</span>
+            Quitar
+          </button>
+          <input id="photoInput" type="file" accept="image/*" hidden />
+        </div>
       </div>
 
       <div>
@@ -235,7 +238,11 @@
         </div>
 
         <div class="bio">
-          <textarea id="bio" maxlength="150" placeholder="Escribe una breve descripción (máx. 150 caracteres)"></textarea>
+          <textarea
+            id="bio"
+            maxlength="150"
+            placeholder="Escribe una breve descripción (máx. 150 caracteres)"
+          ></textarea>
           <div class="row">
             <span class="char-left"><span id="charsLeft">150</span> restantes</span>
             <button id="saveBio" class="save-btn">Guardar</button>
@@ -257,7 +264,7 @@
       </div>
     </section>
 
-    <!-- Acciones: Volver a inicio (izquierda) + Cerrar sesión (derecha) -->
+    <!-- Acciones: Volver a inicio + Cerrar sesión -->
     <div class="actions-row">
       <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
       <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
@@ -364,7 +371,7 @@
       }
     });
 
-    // Contador de vida (segundos en bloque ancho)
+    // Contador de vida
     const birthDate = new Date(me.birthISO);
     const pad2 = n => String(n).padStart(2,'0');
 
@@ -406,7 +413,6 @@
     // Iniciar
     loadProfile();
     updateLife();
-    // Refresco cada segundo (puedes cambiar a loop alineado si prefieres)
     setInterval(updateLife, 1000);
   </script>
 </body>
