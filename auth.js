@@ -106,11 +106,15 @@ export function requireAuth({ redirectTo = "login.html", rememberNext = true } =
   const s = getCurrentPlayer();
   if (!s) {
     const next = location.pathname + location.search + location.hash;
+
     if (rememberNext) {
       try { localStorage.setItem(REDIRECT_KEY, next); } catch {}
     }
-    const url = new URL(redirectTo, location.origin);
+
+    // ⚠️ Base en location.href (misma carpeta), NO en location.origin
+    const url = new URL(redirectTo, location.href);
     if (rememberNext) url.searchParams.set("next", next);
+
     window.location.href = url.toString();
     return null;
   }
