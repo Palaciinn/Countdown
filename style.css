@@ -1,15 +1,13 @@
-body {
+/* Base de la página */
+body{
   margin: 0;
-  padding: 0;
-  background-color: #b14c6079; /* rojo vivo inspirado en la imagen */
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 40px; /* añade espacio al final de toda la página */
-  padding-top: 40px; /* añade espacio al principio de toda la página */
+  background-color: #b14c6079;
   text-align: center;
+  padding-bottom: 40px;
+  /* Altura del banner fijo: usa un rango por si cambia en móvil 
+  padding-top: clamp(36px, 6vh, 56px); */
 }
 
 .countdown-container {
@@ -537,9 +535,82 @@ body {
   100% { transform: translateY(0); opacity: 1; }
 }
 
-body {
-  padding-top: 42px; /* más espacio para nueva altura */
+
+
+
+
+/* ===== Header superior (no fijo) — alineado con el contenido ===== */
+.site-header,
+.main-content{
+  width: 100%;
+  max-width: 520px;   /* el mismo límite para que no “descentre” en desktop */
+  margin: 0 auto;
+  padding: 0 8px;
+  padding-left: 12px;
+  padding-right: clamp(12px, 4vw, 20px);
 }
 
+/* Header (no fijo) con icono a la derecha */
+.site-header{
+  margin-top: 4px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-left: 12px;
+  padding-right: calc(clamp(12px, 4vw, 20px) + env(safe-area-inset-right));
+}
 
+/* Botón/icono de usuario */
+.user-icon-btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #1e293b;
+  color: #fff;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 6px 14px rgba(0,0,0,.35);
+  transition: transform .15s ease, background-color .25s ease, box-shadow .25s ease;
+  margin-right: 20px; /* súbelo a 6–8px si lo quieres aún más separado */
+  margin-top: 20px;
+}
 
+.user-icon-btn .material-symbols-outlined{
+  font-size: 26px;
+  line-height: 1;
+}
+
+.user-icon-btn:hover{
+  background: #111827;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0,0,0,.45);
+}
+
+.user-icon-btn:active{
+  transform: translateY(0);
+  box-shadow: 0 6px 12px rgba(0,0,0,.35);
+}
+
+/* Bloqueo del header mientras el contador esté bloqueado (opcional) */
+body.locked .site-header { pointer-events:none; opacity:.35; filter:blur(1px); }
+body.locked .user-icon-btn { cursor: default; }
+
+/* Micro-ajustes para pantallas muy estrechas */
+@media (max-width: 360px){
+  .site-header, .main-content { padding: 0 6px; }
+}
+
+/* Cuando la página está bloqueada, el header queda deshabilitado */
+body.locked .site-header {
+  pointer-events: none;   /* sin clics */
+  opacity: .35;           /* atenuado */
+  filter: blur(1px);      /* leve blur */
+}
+body.locked .user-icon-btn { cursor: default; }
+
+/* Si lo prefieres oculto del todo, usa esto en su lugar: */
+/* body.locked .site-header { display: none; } */

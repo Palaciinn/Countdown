@@ -83,6 +83,63 @@ const errorMessage = document.getElementById("error-message");
 const questionText = document.getElementById("question-text");
 const changeQuestionBtn = document.getElementById("change-question");
 
+// Helper para mostrar el banner correctamente (quita 'hidden' y añade 'show')
+const showInfoBanner = () => {
+  const infoBanner = document.getElementById("info-banner");
+  if (!infoBanner) return;
+  infoBanner.classList.remove("hidden");
+  infoBanner.classList.add("show");
+};
+
+// ==========================
+// ⏳ Persistencia de desbloqueo (2h) con localStorage
+// ==========================
+const UNLOCK_KEY = "unlockUntilTs";
+const UNLOCK_WINDOW_MS = 2 * 60 * 60 * 1000; // 2h
+
+const getUnlockUntil = () => {
+  const v = localStorage.getItem(UNLOCK_KEY);
+  const n = v ? parseInt(v, 10) : 0;
+  return Number.isFinite(n) ? n : 0;
+};
+
+const isUnlocked = () => Date.now() < getUnlockUntil();
+
+const setUnlockedForWindow = () => {
+  const until = Date.now() + UNLOCK_WINDOW_MS;
+  localStorage.setItem(UNLOCK_KEY, String(until));
+};
+
+const applyUnlockState = () => {
+  if (isUnlocked()) {
+    // Ocultar popups y quitar blur si estamos dentro de la ventana
+    popup.classList.add("hidden");
+    questionPopup.classList.add("hidden");
+    mainContent.classList.remove("blur");
+
+    // Quitar estado bloqueado -> header usable
+    document.body.classList.remove("locked");
+
+    // Mostrar el banner si existe (si lo comentaste, no hace nada)
+    if (typeof showInfoBanner === "function") showInfoBanner();
+  } else {
+    // Mostrar flujo de desbloqueo
+    popup.classList.remove("hidden");
+    questionPopup.classList.add("hidden");
+    mainContent.classList.add("blur");
+
+    // Marcar página bloqueada -> header deshabilitado
+    document.body.classList.add("locked");
+
+    // (Opcional) Ocultar el banner si estuviera visible
+    const infoBanner = document.getElementById("info-banner");
+    if (infoBanner) infoBanner.classList.add("hidden");
+  }
+};
+
+// Aplicar estado al cargar
+document.addEventListener("DOMContentLoaded", applyUnlockState);
+
 // Preguntas y respuestas
 const questions = [
   { question: "¿Cómo se llama mi perro?", answer: "marcus" },
@@ -133,15 +190,21 @@ submitAnswer.addEventListener("click", () => {
       : currentAnswer.includes(userAnswer);
 
   if (isCorrect) {
+    // Ocultar el popup de la pregunta y quitar blur
     questionPopup.classList.add("hidden");
     mainContent.classList.remove("blur");
 
-    // ✅ Mostrar banner con animación y blur
-    const infoBanner = document.getElementById("info-banner");
-    if (infoBanner) {
-      infoBanner.classList.add("show");
-    }
+    // ✅ Quitar el estado bloqueado para que el header sea clickable ya
+    document.body.classList.remove("locked");
 
+    // Mostrar banner
+    showInfoBanner();
+
+    // Guardar la ventana de desbloqueo
+    try { setUnlockedForWindow(); } catch (e) {}
+
+    // (Opcional) Asegurar el popup inicial escondido por si acaso
+    popup.classList.add("hidden");
   } else {
     errorMessage.textContent = "Respuesta incorrecta. Intenta de nuevo.";
   }
@@ -155,7 +218,6 @@ changeQuestionBtn.addEventListener("click", () => {
 // ==========================
 // 🌟 Estrellas de fondo SOLO en sección
 // ==========================
-
 document.querySelectorAll(".custom-button .starry-background").forEach(container => {
   const totalStars = 10; // cantidad por botón
   for (let i = 0; i < totalStars; i++) {
@@ -169,7 +231,6 @@ document.querySelectorAll(".custom-button .starry-background").forEach(container
   }
 });
 
-
 document.querySelectorAll(".custom-button .starry-background, .time-box .starry-background").forEach(container => {
   const totalStars = 20; // menos para tarjetas pequeñas
   for (let i = 0; i < totalStars; i++) {
@@ -182,9 +243,6 @@ document.querySelectorAll(".custom-button .starry-background, .time-box .starry-
     container.appendChild(star);
   }
 });
-
-
-
 
 // ==========================
 // 🗨️ Tarjeta flotante: frases que rotan cada minuto
@@ -230,29 +288,27 @@ document.querySelectorAll(".custom-button .starry-background, .time-box .starry-
   };
 
   const setPhrase = () => {
-  const i = pickIndex();
-  // Pequeña transición de entrada/salida
-  card.style.opacity = 0;
-  card.style.transform = "translateY(-2px)";
-  setTimeout(() => {
-    el.textContent = `“${phrases[i]}”`; // ✅ Añade comillas decorativas
-    card.style.opacity = 1;
-    card.style.transform = "translateY(0)";
+    const i = pickIndex();
+    // Pequeña transición de entrada/salida
+    card.style.opacity = 0;
+    card.style.transform = "translateY(-2px)";
+    setTimeout(() => {
+      el.textContent = `“${phrases[i]}”`; // ✅ Añade comillas decorativas
+      card.style.opacity = 1;
+      card.style.transform = "translateY(0)";
 
-    // ✅ Reiniciar barra de progreso
-    const bar = document.getElementById("progress-bar");
-    if (bar) {
-      bar.style.animation = "none";      // parar animación
-      bar.offsetHeight;                  // forzar reflow
-      bar.style.animation = "fillBar 60s linear forwards";
-    }
-  }, 180);
-};
+      // ✅ Reiniciar barra de progreso
+      const bar = document.getElementById("progress-bar");
+      if (bar) {
+        bar.style.animation = "none";      // parar animación
+        bar.offsetHeight;                  // forzar reflow
+        bar.style.animation = "fillBar 60s linear forwards";
+      }
+    }, 180);
+  };
 
-// Primera carga inmediata
-setPhrase();
-// Cambiar cada minuto
-setInterval(setPhrase, 60 * 1000);
+  // Primera carga inmediata
+  setPhrase();
+  // Cambiar cada minuto
+  setInterval(setPhrase, 60 * 1000);
 })();
-
-

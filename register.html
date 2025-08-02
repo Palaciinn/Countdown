@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Registro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --blue-1: #2563eb; /* Angel */
+      --blue-2: #60a5fa;
+      --pink-1: #ec4899; /* Lily */
+      --pink-2: #f9a8d4;
+      --bg: #0b0f1a;
+      --card-bg: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.12);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --ok: #22c55e;
+      --err: #ef4444;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
+                  radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
+                  var(--bg);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .wrap{
+      width: min(920px, 100%);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    h1{
+      margin: 0 0 8px 0;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    .subtitle{
+      margin: 0 0 22px 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    .cards{
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 18px;
+    }
+    @media (max-width: 720px){
+      .cards{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      position: relative;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      background: var(--card-bg);
+      overflow: clip;
+      padding: 20px;
+      min-height: 160px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+      cursor: pointer;
+      transform: translateZ(0);
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      isolation: isolate;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 16px 38px rgba(0,0,0,.35);
+    }
+    .card.active{
+      transform: translateY(-2px) scale(1.01);
+      z-index: 3;
+      box-shadow: 0 18px 48px rgba(0,0,0,.45);
+      border-color: rgba(255,255,255,.22);
+    }
+
+    .ribbon{
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(200px 120px at 20% 20%, rgba(255,255,255,.18), transparent 50%),
+                  radial-gradient(300px 180px at 80% 0%, rgba(255,255,255,.12), transparent 60%);
+      opacity: .65;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* Accents */
+    .card.angel{ --accent1: var(--blue-1); --accent2: var(--blue-2); }
+    .card.lily { --accent1: var(--pink-1); --accent2: var(--pink-2); }
+
+    .badge{
+      display: inline-grid;
+      place-items: center;
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 8px 18px color-mix(in oklab, var(--accent1) 45%, transparent);
+      user-select: none;
+    }
+
+    .title{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: .2px;
+    }
+    .hint{
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: -6px;
+    }
+
+    .panel{
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      margin-top: 6px;
+      padding-top: 10px;
+      border-top: 1px dashed rgba(255,255,255,.15);
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+    }
+    .card.active .panel{
+      max-height: 160px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .panel input{
+      appearance: none;
+      outline: none;
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 1rem;
+      width: 100%;
+      transition: border-color .2s ease, background .2s ease;
+    }
+    .panel input::placeholder{ color: #cbd5e1; opacity: .6; }
+    .panel input:focus{
+      border-color: color-mix(in oklab, var(--accent1) 65%, white 15%);
+      background: rgba(255,255,255,.09);
+    }
+
+    .btn{
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      box-shadow: 0 10px 22px color-mix(in oklab, var(--accent1) 45%, transparent);
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0); opacity: .95; }
+
+    .msg{
+      grid-column: 1 / -1;
+      margin: 0;
+      font-size: .95rem;
+      color: var(--muted);
+      min-height: 1.2em;
+    }
+    .msg.ok{ color: var(--ok); }
+    .msg.err{ color: var(--err); }
+
+    .footer{
+      margin-top: 8px;
+      font-size: .95rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .footer a{ color: color-mix(in oklab, var(--blue-2) 70%, white 10%); text-decoration: none; }
+    .footer a:hover{ text-decoration: underline; }
+
+    /* === Botón "Volver a inicio" (igual que en login) === */
+    .back-home-btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      margin-top: 6px;
+    }
+    .back-home-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 12px 22px rgba(0,0,0,.35);
+    }
+    .back-home-btn:active{
+      transform: translateY(0);
+      opacity: .95;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Registro</h1>
+    <p class="subtitle">¿Aún no lo has hecho? Está feo eso...</p>
+
+    <div class="cards" id="cards">
+      <!-- Angel -->
+      <section class="card angel" data-name="angel" tabindex="0" aria-label="Registrar a Angel">
+        <div class="ribbon"></div>
+        <div class="title">
+          <div class="badge">A</div>
+          <div>Angel</div>
+        </div>
+        <p class="hint">Pulsa para continuar</p>
+
+        <div class="panel">
+          <input type="password" class="pass" placeholder="Contraseña" autocomplete="new-password" minlength="3" />
+          <button class="btn">Crear cuenta</button>
+          <p class="msg" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <!-- Lily -->
+      <section class="card lily" data-name="lily" tabindex="0" aria-label="Registrar a Lily">
+        <div class="ribbon"></div>
+        <div class="title">
+          <div class="badge">L</div>
+          <div>Lily</div>
+        </div>
+        <p class="hint">Pulsa para continuar</p>
+
+        <div class="panel">
+          <input type="password" class="pass" placeholder="Contraseña" autocomplete="new-password" minlength="3" />
+          <button class="btn">Crear cuenta</button>
+          <p class="msg" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+
+    <p class="footer">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+
+    <!-- Botón Volver a inicio -->
+    <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
+  </div>
+
+  <script type="module">
+    import { registerPlayer } from './auth.js';
+
+    const cards = document.querySelectorAll('.card');
+
+    function activateCard(card){
+      cards.forEach(c => {
+        if (c === card) {
+          c.classList.add('active');
+          c.querySelector('.pass')?.focus();
+          c.querySelector('.msg').textContent = '';
+        } else {
+          c.classList.remove('active');
+          c.querySelector('.msg').textContent = '';
+        }
+      });
+    }
+
+    // Click o Enter para activar tarjeta
+    cards.forEach(card => {
+      card.addEventListener('click', () => activateCard(card));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activateCard(card);
+        }
+      });
+
+      // Submit dentro de la tarjeta
+      const btn = card.querySelector('.btn');
+      const input = card.querySelector('.pass');
+      const msg = card.querySelector('.msg');
+
+      async function submitCard(){
+        msg.classList.remove('ok','err');
+        msg.textContent = '';
+        const name = card.dataset.name;               // 'angel' | 'lily'
+        const pass = (input.value || '').trim();
+
+        if (!pass || pass.length < 3) {
+          msg.classList.add('err');
+          msg.textContent = 'La palabra clave debe tener al menos 3 caracteres';
+          input.focus();
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Creando...';
+
+        try {
+          await registerPlayer({ name, passphrase: pass });
+          msg.classList.add('ok');
+          msg.textContent = 'Cuenta creada y sesión iniciada. Redirigiendo...';
+          setTimeout(() => location.href = 'index.html', 600);
+        } catch (err) {
+          msg.classList.add('err');
+          msg.textContent = err?.message || 'Error al registrar';
+          btn.disabled = false;
+          btn.textContent = 'Crear cuenta';
+          input.select();
+        }
+      }
+
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        submitCard();
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitCard();
+        }
+        e.stopPropagation();
+      });
+    });
+
+    // Activar por defecto la primera tarjeta en pantallas grandes
+    if (window.matchMedia('(min-width: 721px)').matches) {
+      const first = document.querySelector('.card');
+      if (first) activateCard(first);
+    }
+  </script>
+</body>
+</html>

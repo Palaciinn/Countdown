@@ -8,6 +8,19 @@
 </head>
 <body>
 
+  <script type="module">
+  import { requireAuth, currentPlayerName } from './auth.js';
+
+  // Redirige a login.html si no hay sesión o está expirada
+  const s = requireAuth({ redirectTo: 'login.html' });
+
+  // Si hay sesión, puedes saber quién es
+  if (s) {
+    console.log('Jugador actual:', currentPlayerName()); // 'angel' | 'lily'
+    // Ej: document.body.dataset.player = currentPlayerName();
+  }
+  </script>
+
   <!-- Contenedor del tablero -->
   <div id="board"></div>
 
@@ -21,5 +34,6 @@
   <a href="index.html" class="floating-button">⬅ Volver</a>
 
   <script src="cartas.js"></script>
+
 </body>
 </html>

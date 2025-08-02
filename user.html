@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Área de usuario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,600,0,0" />
+  <style>
+    :root{
+      --bg: #0b0f1a;
+      --panel: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.12);
+      --text: #e5e7eb;
+      --muted:#9ca3af;
+      --primary:#2563eb;
+      --ok:#22c55e;
+      --err:#ef4444;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
+        radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
+        var(--bg);
+      display:grid; place-items:center; padding:24px;
+    }
+    /* Móvil: fondo liso (sin franja) */
+    @media (max-width: 600px){
+      body{ background: var(--bg); }
+    }
+
+    .wrap{ width:min(920px,100%); display:grid; gap:18px; justify-items:center; }
+    h1{ margin:0 0 6px 0; font-weight:800; }
+    .subtitle{ margin:0 0 12px 0; color:var(--muted); text-align:center; }
+
+    .card{
+      width:min(720px, 100%);
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:var(--panel);
+      box-shadow:0 12px 26px rgba(0,0,0,.28);
+      padding:18px;
+    }
+
+    /* Perfil */
+    .profile{
+      display:grid; gap:16px;
+      grid-template-columns: auto 1fr;
+      align-items:center;
+    }
+    @media (max-width:640px){
+      .profile{
+        grid-template-columns: 1fr;
+        justify-items:center; text-align:center;
+      }
+      /* Solo ampliamos el bloque de contenido, no el avatar */
+      .profile > div:not(.avatar-wrap){ width:100%; }
+      .card{ padding:16px; }
+    }
+
+    .avatar-wrap{
+      position:relative;
+      width: clamp(96px, 28vw, 128px);
+      aspect-ratio: 1 / 1;
+      border-radius:50%;
+      overflow:hidden;
+      border:2px solid rgba(255,255,255,.18);
+      box-shadow: 0 8px 18px rgba(0,0,0,.35);
+      background:#111827;
+    }
+    .avatar-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    .avatar-btn{
+      position:absolute; bottom:6px;
+      display:inline-flex; align-items:center; justify-content:center;
+      width:36px; height:36px; border-radius:10px;
+      border:1px solid var(--border);
+      color:#fff; cursor:pointer;
+      box-shadow:0 6px 14px rgba(0,0,0,.35);
+      transition:transform .12s ease, background .2s ease, opacity .2s ease;
+    }
+    /* Botón cámara (derecha) */
+    #changePhoto.avatar-btn{ right:6px; background:rgba(0,0,0,.45); }
+    #changePhoto.avatar-btn:hover{ transform:translateY(-1px); background:rgba(0,0,0,.6); }
+    /* Botón quitar (izquierda) */
+    #removePhoto.avatar-btn{ left:6px; background:rgba(239,68,68,.65); }
+    #removePhoto.avatar-btn:hover{ transform:translateY(-1px); background:rgba(239,68,68,.85); }
+
+    .identity h2{ margin:.2rem 0 .4rem 0; font-size:1.3rem; }
+
+    /* Solo “Cumpleaños” */
+    .facts{
+      display:grid; gap:6px;
+      margin: 8px 0 14px 0;
+      text-align:left;
+    }
+    @media (max-width:640px){ .facts{ text-align:left; } }
+    .fact{ display:flex; gap:8px; }
+    .fact .label{ font-weight:800; min-width:110px; color:#dbeafe; }
+    .fact .value{ color:var(--text); }
+
+    .bio{ display:grid; gap:8px; }
+    .bio textarea{
+      width:100%;
+      min-height:96px; resize:vertical;
+      border-radius:12px; border:1px solid var(--border);
+      background:rgba(255,255,255,.08); color:var(--text);
+      padding:12px 14px; outline:none;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .bio .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .char-left{ color:var(--muted); font-size:.9rem; }
+    .save-btn{
+      appearance:none; border:none; border-radius:12px; padding:10px 14px;
+      font-weight:700; color:#fff; background:linear-gradient(135deg, #2563eb, #60a5fa);
+      box-shadow: 0 10px 22px rgba(37,99,235,.35);
+      cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .save-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(37,99,235,.45); }
+    .save-btn:active{ transform:none; opacity:.95; }
+    .msg{ margin:0; min-height:1.2em; font-size:.95rem; color:var(--muted); }
+    .msg.ok{ color:var(--ok); }
+    .msg.err{ color:var(--err); }
+
+    /* Vida */
+    .life-card h3{ margin:0 0 10px 0; font-size:1.1rem; color:#cbd5e1; text-align:left; }
+    .life-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr)); /* móvil: 2 columnas */
+      gap:12px;
+    }
+    @media (min-width: 460px){
+      .life-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } /* más ancho: 3 */
+    }
+    .metric{
+      background:rgba(255,255,255,.08);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      display:grid; gap:4px; justify-items:center;
+      min-height:80px;
+      box-shadow: 0 6px 14px rgba(0,0,0,.25);
+    }
+    .metric .num{
+      font-size: clamp(1.2rem, 5.5vw, 1.6rem);
+      font-weight:800;
+      line-height:1;
+      font-variant-numeric: tabular-nums;
+    }
+    .metric .lab{ font-size:.9rem; color:var(--muted); }
+    /* Segundos ancho */
+    .metric--wide{ grid-column: 1 / -1; }
+    .metric--wide .num{ font-size: clamp(1.6rem, 7vw, 2.2rem); }
+    .metric--wide .lab{ font-size: 1rem; }
+
+    /* === Botón "Volver a inicio" (igual que en login/register) === */
+    .back-home-btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(0,0,0,.25);
+      transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .back-home-btn:hover{
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.12);
+      box-shadow: 0 12px 22px rgba(0,0,0,.35);
+    }
+    .back-home-btn:active{
+      transform: translateY(0);
+      opacity: .95;
+    }
+
+    /* Fila de acciones (no sustituye nada; solo organiza ambos botones) */
+    .actions-row{
+      display:flex;
+      gap:12px;
+      justify-content:center;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:0px;
+      margin-bottom: 20px;
+    }
+    .actions-row .logout-btn{
+      display:inline-flex; align-items:center; justify-content:center;
+    }
+
+    /* Botón cerrar sesión (ya lo tenías) */
+    .logout-btn{
+      appearance:none; border:none; border-radius:12px;
+      padding:12px 16px; font-weight:700; color:#fff;
+      background:linear-gradient(135deg, #ef4444, #f97316);
+      box-shadow: 0 10px 22px rgba(239,68,68,.35);
+      cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+    }
+    .logout-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(239,68,68,.45); }
+    .logout-btn:active{ transform:none; opacity:.95; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Tu perfil</h1>
+    <p class="subtitle">Configura tu Área</p>
+
+    <!-- Perfil -->
+    <section class="card profile">
+      <div class="avatar-wrap">
+        <img id="avatar" alt="Foto de perfil" />
+        <!-- Botón quitar foto -->
+        <button id="removePhoto" class="avatar-btn" title="Quitar foto" aria-label="Quitar foto">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <!-- Botón cambiar foto -->
+        <button id="changePhoto" class="avatar-btn" title="Cambiar foto" aria-label="Cambiar foto">
+          <span class="material-symbols-outlined">photo_camera</span>
+        </button>
+        <input id="photoInput" type="file" accept="image/*" hidden />
+      </div>
+
+      <div>
+        <div class="identity">
+          <h2 id="fullName">—</h2>
+        </div>
+
+        <div class="bio">
+          <textarea id="bio" maxlength="150" placeholder="Escribe una breve descripción (máx. 150 caracteres)"></textarea>
+          <div class="row">
+            <span class="char-left"><span id="charsLeft">150</span> restantes</span>
+            <button id="saveBio" class="save-btn">Guardar</button>
+          </div>
+          <p id="saveMsg" class="msg" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vida -->
+    <section class="card life-card">
+      <h3>Tiempo de vida</h3>
+      <div class="life-grid">
+        <div class="metric"><div class="num" id="lifeYears">0</div><div class="lab">Años</div></div>
+        <div class="metric"><div class="num" id="lifeDays">0</div><div class="lab">Días</div></div>
+        <div class="metric"><div class="num" id="lifeHours">00</div><div class="lab">Horas</div></div>
+        <div class="metric"><div class="num" id="lifeMinutes">00</div><div class="lab">Min</div></div>
+        <div class="metric metric--wide"><div class="num" id="lifeSeconds">00</div><div class="lab">Seg</div></div>
+      </div>
+    </section>
+
+    <!-- Acciones: Volver a inicio (izquierda) + Cerrar sesión (derecha) -->
+    <div class="actions-row">
+      <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
+      <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <script type="module">
+    import { requireAuth, currentPlayerName, logout } from './auth.js';
+
+    const DEFAULT_AVATAR = 'fotos/1.png'; // cambia si quieres otro por defecto
+
+    // 🔒 Requiere sesión
+    const s = requireAuth({ redirectTo: 'login.html' });
+    if (!s) throw new Error('No session');
+
+    const who = currentPlayerName(); // 'angel' | 'lily'
+
+    const profiles = {
+      lily:  { first:'Lily',  last:'Manea', birthISO:'2004-05-04T00:00:00' },
+      angel: { first:'Angel', last:'Palacin', birthISO:'2002-07-10T00:00:00' }
+    };
+    const me = profiles[who];
+
+    // ----- UI refs
+    const avatar     = document.getElementById('avatar');
+    const photoInput = document.getElementById('photoInput');
+    const changeBtn  = document.getElementById('changePhoto');
+    const removeBtn  = document.getElementById('removePhoto');
+    const fullName   = document.getElementById('fullName');
+    const bioEl      = document.getElementById('bio');
+    const charsLeft  = document.getElementById('charsLeft');
+    const saveBioBtn = document.getElementById('saveBio');
+    const saveMsg    = document.getElementById('saveMsg');
+    const logoutBtn  = document.getElementById('logoutBtn');
+
+    const key = (field) => `profile_${who}_${field}`;
+
+    function loadProfile() {
+      fullName.textContent = `${me.first} ${me.last}`;
+
+      const savedAvatar = localStorage.getItem(key('avatar'));
+      avatar.src = savedAvatar || DEFAULT_AVATAR;
+
+      const savedBio = localStorage.getItem(key('bio')) || '';
+      bioEl.value = savedBio;
+      updateCharsLeft();
+    }
+
+    function updateCharsLeft() {
+      const left = 150 - (bioEl.value || '').length;
+      charsLeft.textContent = left;
+    }
+
+    // Cambiar foto
+    changeBtn.addEventListener('click', () => photoInput.click());
+    photoInput.addEventListener('change', () => {
+      const file = photoInput.files?.[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        saveMsg.textContent = 'El archivo debe ser una imagen';
+        saveMsg.className = 'msg err';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result;
+        avatar.src = dataUrl;
+        try {
+          localStorage.setItem(key('avatar'), dataUrl);
+          saveMsg.textContent = 'Foto actualizada';
+          saveMsg.className = 'msg ok';
+        } catch {
+          saveMsg.textContent = 'No se pudo guardar la foto (tamaño muy grande)';
+          saveMsg.className = 'msg err';
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Quitar foto (volver por defecto)
+    removeBtn.addEventListener('click', () => {
+      try {
+        localStorage.removeItem(key('avatar'));
+        avatar.src = DEFAULT_AVATAR;
+        saveMsg.textContent = 'Foto restablecida';
+        saveMsg.className = 'msg ok';
+      } catch {
+        saveMsg.textContent = 'No se pudo restablecer la foto';
+        saveMsg.className = 'msg err';
+      }
+    });
+
+    // Guardar bio
+    bioEl.addEventListener('input', updateCharsLeft);
+    saveBioBtn.addEventListener('click', () => {
+      const text = (bioEl.value || '').trim().slice(0,150);
+      try {
+        localStorage.setItem(key('bio'), text);
+        saveMsg.textContent = 'Descripción guardada';
+        saveMsg.className = 'msg ok';
+      } catch {
+        saveMsg.textContent = 'No se pudo guardar';
+        saveMsg.className = 'msg err';
+      }
+    });
+
+    // Contador de vida (segundos en bloque ancho)
+    const birthDate = new Date(me.birthISO);
+    const pad2 = n => String(n).padStart(2,'0');
+
+    function updateLife(){
+      const now = new Date();
+
+      // Años cumplidos exactos
+      let years = now.getFullYear() - birthDate.getFullYear();
+      const hasntHadBirthday =
+        (now.getMonth() < birthDate.getMonth()) ||
+        (now.getMonth() === birthDate.getMonth() && now.getDate() < birthDate.getDate());
+      if (hasntHadBirthday) years--;
+
+      // Desde el último cumpleaños
+      const lastBirthdayYear = now.getFullYear() - (hasntHadBirthday ? 1 : 0);
+      const lastBirthday = new Date(lastBirthdayYear, birthDate.getMonth(), birthDate.getDate(), 0,0,0);
+
+      let diff = now - lastBirthday;
+      const dayMs = 24*60*60*1000, hourMs = 60*60*1000, minMs = 60*1000, secMs = 1000;
+
+      const days  = Math.floor(diff / dayMs);  diff %= dayMs;
+      const hours = Math.floor(diff / hourMs); diff %= hourMs;
+      const mins  = Math.floor(diff / minMs);  diff %= minMs;
+      const secs  = Math.floor(diff / secMs);
+
+      document.getElementById('lifeYears').textContent   = years;
+      document.getElementById('lifeDays').textContent    = days;
+      document.getElementById('lifeHours').textContent   = pad2(hours);
+      document.getElementById('lifeMinutes').textContent = pad2(mins);
+      document.getElementById('lifeSeconds').textContent = pad2(secs);
+    }
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      logout();
+      location.href = 'login.html';
+    });
+
+    // Iniciar
+    loadProfile();
+    updateLife();
+    // Refresco cada segundo (puedes cambiar a loop alineado si prefieres)
+    setInterval(updateLife, 1000);
+  </script>
+</body>
+</html>
