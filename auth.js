@@ -40,15 +40,34 @@ const ALIGN_UNLOCK_WITH_SESSION = false; // ⛔ no tocar 'unlockUntilTs'
 // ==========================
 const REDIRECT_KEY = "postLoginRedirect";
 
-// Evita open-redirects: solo acepta misma origin
+// Detecta basePath para GitHub Pages (p. ej. "/Countdown/")
+function getAppBasePath() {
+  // Si es *.github.io y hay subruta tipo /repo/...
+  if (location.hostname.endsWith("github.io")) {
+    const parts = location.pathname.split("/").filter(Boolean); // ["repo","..."]
+    if (parts.length > 0) return `/${parts[0]}/`;
+  }
+  return "/"; // root en hosting normal
+}
+
+// Resuelve una ruta de la app (p. ej. "login.html") a una ruta absoluta dentro del basePath
+function resolveAppPath(path = "index.html") {
+  if (/^https?:\/\//i.test(path)) return path; // ya es absoluta
+  const base = getAppBasePath();
+  const clean = path.startsWith("/") ? path.slice(1) : path;
+  return `${base}${clean}`;
+}
+
+// Evita open-redirects: solo permite volver a la MISMA origin
 function sanitizeNextUrl(next, fallback = "index.html") {
+  const safeFallback = resolveAppPath(fallback);
   try {
     const u = new URL(next, location.origin);
     if (u.origin === location.origin) {
       return u.pathname + u.search + u.hash;
     }
   } catch {}
-  return fallback;
+  return safeFallback;
 }
 
 export function getCurrentPlayer() {
@@ -101,21 +120,17 @@ export function logout() {
   // ❌ No borrar 'unlockUntilTs' aquí
 }
 
-// ✅ Nueva versión: recuerda a dónde quería ir el usuario y añade ?next=...
+// ✅ Recuerda a dónde quería ir el usuario y añade ?next=...
 export function requireAuth({ redirectTo = "login.html", rememberNext = true } = {}) {
   const s = getCurrentPlayer();
   if (!s) {
     const next = location.pathname + location.search + location.hash;
-
     if (rememberNext) {
       try { localStorage.setItem(REDIRECT_KEY, next); } catch {}
     }
-
-    // ⚠️ Base en location.href (misma carpeta), NO en location.origin
-    const url = new URL(redirectTo, location.href);
-    if (rememberNext) url.searchParams.set("next", next);
-
-    window.location.href = url.toString();
+    const loginUrl = new URL(resolveAppPath(redirectTo), location.origin);
+    if (rememberNext) loginUrl.searchParams.set("next", next);
+    window.location.href = loginUrl.toString();
     return null;
   }
   return s;
