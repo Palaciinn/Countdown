@@ -1,6 +1,53 @@
 // ==========================
+// ⏳ Contador progresivo estable
+// ==========================
+const startDate = new Date("2025-08-18T17:30:00").getTime();
+// Si necesitas fijar huso horario (Madrid en agosto, CEST, UTC+02):
+// const startDate = new Date("2025-08-18T17:30:00+02:00").getTime();
+
+let timerId;
+
+const render = (elapsed) => {
+  if (elapsed < 0) {
+    document.querySelector(".countdown").innerHTML = "<h2>El contador aún no ha comenzado</h2>";
+    return;
+  }
+
+  const days = Math.floor(elapsed / 86400000); // 1000*60*60*24
+  const hours = Math.floor((elapsed % 86400000) / 3600000); // 1000*60*60
+  const minutes = Math.floor((elapsed % 3600000) / 60000);  // 1000*60
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+
+  document.getElementById("days").textContent = days;
+  document.getElementById("hours").textContent = hours;
+  document.getElementById("minutes").textContent = minutes;
+  document.getElementById("seconds").textContent = seconds;
+};
+
+const tick = () => {
+  const now = Date.now();
+  render(now - startDate);
+
+  // Alinear el siguiente tick al próximo "cambio de segundo" real
+  // y añadir un pequeño colchón para evitar programar con 0 ms.
+  const delay = (1000 - (now % 1000)) + 5;
+  timerId = setTimeout(tick, delay);
+};
+
+// Re-sincroniza al volver a la pestaña (evita saltos al regresar)
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    clearTimeout(timerId);
+    tick();
+  }
+});
+
+tick();
+
+// ==========================
 // 🕒 Cuenta regresiva
 // ==========================
+/*
 const countdownDate = new Date("2025-08-04T08:20:00").getTime();
 
 const updateCountdown = () => {
@@ -25,6 +72,8 @@ const updateCountdown = () => {
 
 updateCountdown();
 setInterval(updateCountdown, 1000);
+
+*/
 
 // ==========================
 // 🖼️ Carrusel de imágenes
