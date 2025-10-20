@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=cottage" />
+  <title>MVP Parchís / Ludo — Jugable</title>
+  <style>
+    :root{
+      --bg:#0b0d11; --panel:#10151c; --ink:#e7edf5; --muted:#9aa7b6;
+      --accent:#6aa8ff; --ok:#22c55e; --warn:#eab308; --bad:#ef4444; --border:#1f2835;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b0d11,#0e141c 60%,#0b0d11);color:var(--ink);font:500 16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,Helvetica,sans-serif}
+    header{max-width:1060px;margin:20px auto 10px;padding:0 16px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .brand{display:flex;gap:10px;align-items:center}
+    .brand h1{font-size:18px;margin:0;font-weight:750;letter-spacing:.3px}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent);box-shadow:0 0 20px rgba(106,168,255,.5)}
+
+    .app{max-width:1060px;margin:0 auto;padding:16px}
+    .wrap{display:grid;grid-template-columns:1fr 340px;gap:16px}
+    @media (max-width: 920px){.wrap{grid-template-columns:1fr}}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 32px rgba(0,0,0,.25)}
+    .board-card{padding:8px;display:flex;justify-content:center;align-items:center}
+    .ui-card{padding:16px}
+
+    .board{width:min(92vw,700px);aspect-ratio:1/1}
+    svg{width:100%;height:100%;display:block}
+
+    .controls{display:grid;gap:12px}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    label{color:var(--muted)}
+    select,button{background:#0f1520;border:1px solid var(--border);color:var(--ink);padding:10px 12px;border-radius:12px}
+    button{cursor:pointer;font-weight:700}
+    button.primary{background:linear-gradient(180deg,#1b2433,#0f1520);border-color:#2a3446}
+    button:disabled{opacity:.5;cursor:not-allowed}
+
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0d131d;color:var(--muted);font-size:13px}
+    .swatch{width:12px;height:12px;border-radius:999px;border:2px solid rgba(255,255,255,.25)}
+
+    .die{font-size:42px;font-weight:800;letter-spacing:1px}
+    .status{color:var(--muted)}
+    .hint{font-size:13px;color:#aab5c5}
+
+    .movable{stroke:#fff;stroke-width:3;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+    .token{cursor:pointer}
+    .node{fill:#1b2634}
+    .node.q0{fill:#ef47475c}
+    .node.q1{fill:#1d3c39}
+    .node.q2{fill:#443c1d}
+    .node.q3{fill:#3b82f65c}
+    .home-node{fill:#13202e}
+    .center{fill:#0d1622}
+    .label{fill:#70839c;font-size:10px}
+    .outline{stroke:#223148;stroke-width:2}
+
+    .legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+    .legend .pill{justify-content:space-between}
+
+    .hr{height:1px;background:var(--border);margin:12px 0}
+    
+    /* Icono de casilla de salida (Material Symbols) */
+    .label.icon{
+      font-family: 'Material Symbols Outlined';
+      font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+      font-size: 12px;
+      opacity: 0.5;   /* baja opacidad */
+      pointer-events: none;
+    }
+
+    /* 1) Regla base anti-desbordes */
+html, body { overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+
+/* 2) Medios y SVG escalables */
+img, svg, canvas, video { display:block; max-width:100%; height:auto; }
+
+/* 3) Evita el clásico 100vw + padding = scroll lateral */
+[class*="container"], [class*="wrap"], [class*="panel"], [class*="card"] {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 4) Si algún contenedor usa 100vw, fuerzo 100% */
+.container, .page, .shell {
+  width: 100%;  /* en lugar de 100vw */
+}
+
+/* 5) Flex items que se niegan a encoger (muy común en botones/inputs) */
+.flex > * { min-width: 0; }
+.grid > * { min-width: 0; }
+
+/* 6) El tablero: que el SVG no cree overflow por borde/sombra */
+.board, .board-wrap, #board, svg#board {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;      /* corta cualquier píxel suelto del stroke/shadow */
+  border-radius: inherit;
+}
+
+/* 7) Botoneras/controles: que rompan a varias líneas en pantallas estrechas */
+.controls, .toolbar, .filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .75rem;
+}
+
+/* 8) Evita que pill-tags/badges crezcan más que el viewport */
+.badge, .pill, .chip { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+
+
+
+
+
+/* ========== Anti-desbordes base ========== */
+html, body { overflow-x: hidden; }
+*, *::before, *::after { box-sizing: border-box; }
+img, svg, canvas, video { display:block; max-width:100%; height:auto; }
+
+/* ========== Reglas (pill responsive) ========== */
+/* Contenedor tipo pastilla que puede partirse en varias líneas */
+.rules-pill, .rulesWrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem .75rem;
+  padding:.5rem .75rem;
+  border:1px solid var(--border);
+  background:var(--bg-soft);
+  border-radius:999px;      /* en móvil lo haremos menos redondeado */
+  max-width:100%;
+}
+
+/* Cada regla como “chip” que se recoloca */
+.rules-pill > span, .rulesWrap > span{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.35rem .6rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.02);
+  flex:1 1 120px;           /* base: caben dos por fila si hace falta */
+  min-width:110px;
+  white-space:nowrap;        /* evita saltos feos dentro de cada chip */
+}
+
+@media (max-width: 540px){
+  .rules-pill, .rulesWrap{ border-radius:16px; } /* mejor cuando hay múltiples líneas */
+  .rules-pill > span, .rulesWrap > span{
+    flex:1 1 45%;
+    min-width:135px;
+    font-size:.9rem;
+    padding:.4rem .55rem;
+  }
+}
+
+/* ========== Fichas por jugador (grid responsive) ========== */
+.players-grid, .legendGrid{
+  display:grid;
+  gap:.75rem;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+}
+
+@media (max-width: 860px){
+  .players-grid, .legendGrid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+@media (max-width: 420px){
+  .players-grid, .legendGrid{ grid-template-columns: 1fr; }
+}
+
+/* Tarjeta de jugador tipo “pastilla” */
+.player-card, .legendItem{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  padding:.65rem .9rem;
+  border:1px solid var(--border);
+  background:var(--bg-soft);
+  border-radius:999px;
+  min-width:0;              /* <- clave para que no empujen y creen scroll */
+}
+
+/* Nombre a la izquierda (con punto de color) + evitar cortes raros */
+.player-card .name, .legendItem .name{
+  display:flex; align-items:center; gap:.5rem; min-width:0;
+}
+.player-card .name span, .legendItem .name span{
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+/* Contador a la derecha, no se encoge */
+.player-card .count, .legendItem .count{ flex:0 0 auto; opacity:.9; }
+
+/* Puntito de color reutilizable (si no lo tienes ya) */
+.dot{
+  width:.6rem; height:.6rem; border-radius:999px; background:var(--c, #999);
+  box-shadow:0 0 0 4px color-mix(in oklab, var(--c, #999), transparent 78%);
+}
+
+
+
+
+/* ===== Base anti-scroll lateral ===== */
+html, body { overflow-x:hidden; }
+*, *::before, *::after { box-sizing:border-box; }
+img, svg, canvas, video { display:block; max-width:100%; height:auto; }
+
+/* ===== Leyenda (id="legend") — grid responsive ===== */
+#legend{
+  display:grid;
+  gap:.75rem;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+
+/* 2 columnas en tablet, 1 columna en mobile */
+@media (max-width:860px){
+  #legend{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:420px){
+  #legend{ grid-template-columns:1fr; }
+}
+
+/* Cada item de leyenda como “pill” flexible que NO cree overflow */
+#legend > *{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:.75rem;
+  padding:.6rem .9rem;
+  border:1px solid var(--border);
+  background:var(--bg-soft);
+  border-radius:999px;
+  min-width:0; /* ← CLAVE: permite encoger sin empujar el layout */
+}
+
+/* Primera parte (punto + nombre) que puede elipsis si no cabe */
+#legend > * > :first-child{
+  display:flex; align-items:center; gap:.5rem;
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* Contador a la derecha sin encogerse */
+#legend > * > :last-child{ flex:0 0 auto; opacity:.9; }
+
+/* ===== Reglas — convierte la “pastilla” en multi-línea sin desbordar ===== */
+/* Si tu pastilla de reglas ya tiene una clase, cámbiala aquí; si no, 
+   estos selectores capturan la mayoría de “pastillas” del header. */
+.rules, .rules-pill, .meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.5rem .75rem;
+  padding:.5rem .75rem;
+  border:1px solid var(--border);
+  background:var(--bg-soft);
+  border-radius:16px;      /* mejor en varias líneas */
+  max-width:100%;
+}
+
+/* Cada “chip” de regla dentro de la pastilla */
+.rules > *, .rules-pill > *, .meta > *{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:.35rem;
+  padding:.35rem .6rem;
+  border-radius:999px;
+  background:rgba(255,255,255,.04);
+  flex:1 1 120px;       /* caben 2–3 por fila si estrecha */
+  min-width:110px;
+  white-space:nowrap;
+}
+
+@media (max-width:540px){
+  .rules > *, .rules-pill > *, .meta > *{
+    flex:1 1 45%;
+    min-width:135px;
+    font-size:.92rem;
+    padding:.4rem .55rem;
+  }
+}
+
+/* ===== Layout principal — columnas a una sola en móvil ===== */
+.app .wrap{
+  display:grid;
+  grid-template-columns: 1fr 360px;
+  gap:1rem;
+}
+@media (max-width:980px){
+  .app .wrap{ grid-template-columns:1fr; }
+}
+
+
+
+
+/* 1) Quita el comportamiento "ellipsis" de .pill para permitir wraps */
+.badge, .chip { 
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* IMPORTANTE: .pill NO debe recortar ni forzar ellipsis */
+.pill{
+  overflow: visible;
+  text-overflow: initial;
+}
+
+/* 2) Haz .pill realmente responsive (wrapping y ancho seguro) */
+header{
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+}
+header > .brand{ min-width: 0; }      /* evita que la marca empuje */
+header > .pill{
+  display: flex;
+  flex-wrap: wrap;                    /* ← permite varias líneas */
+  gap: .5rem .75rem;
+  max-width: 100%;
+  min-width: 0;                       /* ← clave para que pueda encoger */
+  border-radius: 16px;                /* en multi-línea queda mejor que 999px */
+}
+
+/* 3) Cada “chip” dentro de la pill se recoloca y no rompe el layout */
+header > .pill > *{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  white-space: nowrap;                /* el texto dentro no parte raro */
+  flex: 1 1 120px;                    /* puede ir 2–3 por fila */
+  min-width: 110px;
+}
+
+/* 4) En móvil estrecho, aún más cómodo */
+@media (max-width: 540px){
+  header{ flex-direction: column; align-items: stretch; }
+  header > .pill{ align-self: stretch; }
+  header > .pill > *{
+    flex: 1 1 45%;
+    min-width: 135px;
+    font-size: .92rem;
+    padding: .4rem .55rem;
+  }
+}
+
+
+
+/* ===== LEGEND — versión robusta para escritorio y móvil ===== */
+
+/* 1) Grid fluido con tarjetas anchas en desktop y columnas auto en mobile */
+#legend{
+  display: grid !important;
+  gap: .75rem !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+}
+
+/* 2) Cada item como “pill” flexible */
+#legend > *{
+  display: flex !important;
+  align-items: center !important;
+  gap: .5rem .75rem !important;
+  padding: .6rem .9rem !important;
+  border: 1px solid var(--border) !important;
+  background: var(--bg-soft) !important;
+  border-radius: 999px !important;
+  min-width: 0 !important;       /* clave para que no empuje */
+}
+
+/* 3) Cualquier span interno: que no rompa el layout */
+#legend > * > *{
+  line-height: 1.2;
+  white-space: nowrap;            /* no partas “2 fichas” */
+}
+
+/* 4) Empuja el último (contador) a la derecha sin necesidad de wrapper */
+#legend > * > :last-child{
+  margin-left: auto !important;
+  flex: 0 0 auto !important;
+  opacity: .9;
+}
+
+/* 5) PUNTO de color (si es un span/div) */
+#legend .dot{
+  width: .6rem; height: .6rem; border-radius: 999px;
+  background: var(--c, #999);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--c, #999), transparent 78%);
+  flex: 0 0 auto;
+}
+
+/* 6) Nombre (si existe como hermano suelto) que pueda encoger sin desaparecer */
+#legend .name{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 7) Breakpoints suaves (por si el panel derecho es estrecho) */
+@media (max-width: 860px){
+  #legend{ grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+@media (max-width: 420px){
+  #legend{ grid-template-columns: 1fr !important; }
+}
+
+
+
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="dot"></span><h1>MVP Parchís / Ludo</h1></div>
+    <div class="pill">Reglas: <span>5 para salir</span><span>6 repite</span><span>capturas válidas</span></div>
+  </header>
+
+  <main class="app">
+    <div class="wrap">
+      <section class="card board-card">
+        <div id="board" class="board"></div>
+      </section>
+
+      <aside class="card ui-card">
+        <div class="controls">
+          <div class="row">
+            <label>Jugadores:</label>
+            <select id="players">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+            </select>
+          </div>
+          <div class="row">
+            <label>Fichas por jugador:</label>
+            <select id="tokens">
+              <option value="1">1</option>
+              <option value="2" selected>2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+          </div>
+          <div class="row">
+            <button id="new" class="primary">Nueva partida</button>
+          </div>
+
+          <div class="row" style="justify-content:space-between">
+            <div>
+              <div class="status" id="status">Turno de…</div>
+              <div class="hint">Tira el dado y toca una ficha iluminada para mover.</div>
+            </div>
+            <div class="die" id="die">–</div>
+          </div>
+
+          <div class="row">
+            <button id="roll" class="primary">Tirar dado</button>
+          </div>
+
+          <div class="hr"></div>
+          <div class="legend" id="legend"></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+<script>
+(() => {
+
+  // ====== Constantes del juego (reglas simplificadas tipo Ludo) ======
+  const TRACK_LEN = 40;
+  const HOME_LEN = 6;
+  const COLORS = ['#ef4444','#22c55e','#eab308','#3b82f6'];
+  const NAMES = ['ROJO','VERDE','AMARILLO','AZUL'];
+  const STARTS = [0,10,20,30];
+  const ANGLES = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+  const SIZE = 650;
+  const CX = SIZE/2, CY = SIZE/2;
+  const R_TRACK = 260;
+  const R_HOME_STEP = 32;
+  const NODE_R = 9;
+  const svgNS = 'http://www.w3.org/2000/svg';
+
+  let svg, gTrack, gHomes, gTokens, gLabels;
+
+  const trackPoints = Array.from({length:TRACK_LEN}, (_,i) => {
+    const a = (2*Math.PI * i/TRACK_LEN) - Math.PI/2;
+    return { x: CX + Math.cos(a)*R_TRACK, y: CY + Math.sin(a)*R_TRACK, angle:a };
+  });
+
+  const homePoints = Array.from({length:4}, (_,p) => {
+    const a = ANGLES[p];
+    return Array.from({length:HOME_LEN}, (_,k) => {
+      const r = R_TRACK - (k+1)*R_HOME_STEP;
+      return { x: CX + Math.cos(a)*r, y: CY + Math.sin(a)*r };
+    });
+  });
+
+  function basePoint(p, t, total){
+    const a = ANGLES[p];
+    const r = R_TRACK + 43;         // alejamos un poco más del borde
+    const spread = 18;              // más separación entre fichas (antes 22)
+    const offset = (t - (total-1)/2) * spread;
+    const ax = a + (Math.PI/2) * (offset/100);
+    return {
+      x: CX + Math.cos(ax)*r,
+      y: CY + Math.sin(ax)*r
+    };
+  }
+
+
+  function finishedPoint(p, t){
+    const radius = 18;
+    const a = ANGLES[p] + Math.PI/8 * (t%6);
+    return { x: CX + Math.cos(a)*radius, y: CY + Math.sin(a)*radius };
+  }
+
+  // ====== Estado del juego ======
+  let state = {
+    numPlayers: 4,
+    tokensPerPlayer: 2,
+    current: 0,
+    die: null,
+    canRoll: true,
+    tokens: [],
+    movable: new Map(),
+  };
+
+  // ====== Inicialización de UI ======
+  const elBoard  = document.getElementById('board');
+  const elPlayers= document.getElementById('players');
+  const elTokens = document.getElementById('tokens');
+  const elNew    = document.getElementById('new');
+  const elRoll   = document.getElementById('roll');
+  const elDie    = document.getElementById('die');
+  const elStatus = document.getElementById('status');
+  const elLegend = document.getElementById('legend');
+
+  elNew.addEventListener('click', () => {
+    state.numPlayers = +elPlayers.value;
+    state.tokensPerPlayer = +elTokens.value;
+    newGame();
+  });
+
+  elRoll.addEventListener('click', onRoll);
+
+  // ====== Lógica de juego ======
+  function newGame(){
+    state.current = 0;
+    state.die = null;
+    state.canRoll = true;
+    state.tokens = Array.from({length:4}, (_,p) => {
+      const count = p < state.numPlayers ? state.tokensPerPlayer : 0;
+      return Array.from({length:count}, () => ({progress:-1}));
+    });
+    state.movable = new Map();
+    buildLegend();
+    ensureSVG();
+    renderAll();
+    announceTurn();
+  }
+
+  function onRoll(){
+    if(!state.canRoll) return;
+
+    const r = 1 + Math.floor(Math.random()*6);
+    state.die = r;
+    state.canRoll = false;
+    elDie.textContent = r;
+
+    computeMovables();
+    renderAll();
+
+    if(state.movable.size === 0){
+      setTimeout(() => {
+        announce(`Sin movimientos para ${NAMES[state.current]}.`);
+        nextPlayer(false);
+      }, 450);
+    } else if(state.movable.size === 1){
+      const [key, dest] = [...state.movable.entries()][0];
+      const [p, t] = key.split('-').map(Number);
+      setTimeout(() => moveToken(p,t,dest), 450);
+    }
+  }
+
+  function nextPlayer(extra){
+    if(extra){
+      state.canRoll = true;
+      state.die = null;
+      elDie.textContent = '–';
+      announce(`${NAMES[state.current]} repite turno por sacar 6.`);
+    } else {
+      state.current = (state.current + 1) % state.numPlayers;
+      state.canRoll = true;
+      state.die = null;
+      elDie.textContent = '–';
+    }
+    state.movable.clear();
+    renderAll();
+    announceTurn();
+  }
+
+  function announceTurn(){
+    elStatus.textContent = `Turno de ${NAMES[state.current]}`;
+  }
+
+  function announce(msg){
+    elStatus.textContent = msg;
+  }
+
+  function computeMovables(){
+    state.movable.clear();
+    const p = state.current;
+    const die = state.die;
+    const tokens = state.tokens[p];
+    if(!tokens) return;
+
+    for(let t=0; t<tokens.length; t++){
+      // Ignorar fichas ya finalizadas (en 46)
+      if(tokens[t].progress === 40 + HOME_LEN) continue;
+      const dest = calcDestProgress(p, tokens[t].progress, die);
+      if(dest !== null && canLand(p, tokens[t].progress, dest)){
+        state.movable.set(`${p}-${t}`, dest);
+      }
+    }
+    updateTokenInteractivity();
+  }
+
+  function calcDestProgress(p, progress, die){
+    const finish = 40 + HOME_LEN;
+
+    if(progress === finish) return null;
+
+    if(progress === -1){
+      return die === 5 ? 0 : null; // sale con 5
+    }
+
+    const np = progress + die;
+    if(progress < 40){
+      if(np < 40) return np;           // anillo
+      if(np <= finish) return np;      // entra/avanza meta
+      return null;                     // se pasa
+    }
+    if(progress < finish){
+      return (np <= finish) ? np : null; // pasillo 40..45
+    }
+    return null;
+  }
+
+  function canLand(p, fromProgress, toProgress){
+    const finish = 40 + HOME_LEN;
+
+    // Anillo exterior: no caer en casilla propia
+    if(toProgress < 40){
+      const destIndex = (STARTS[p] + toProgress) % TRACK_LEN;
+      for(let pp=0; pp<state.numPlayers; pp++){
+        for(let tt=0; tt<state.tokens[pp].length; tt++){
+          const pr = state.tokens[pp][tt].progress;
+          if(pr >= 0 && pr < 40){
+            const idx = (STARTS[pp] + pr) % TRACK_LEN;
+            if(idx === destIndex){
+              if(pp === p) return false; // propia ocupando
+            }
+          }
+        }
+      }
+      return true;
+    }
+
+    // Meta final (46): permitir apilar varias fichas propias
+    if(toProgress === finish) return true;
+
+    // Pasillo 40..45: exclusiva por casilla
+    if(toProgress > 40 && toProgress < finish){
+      const slot = toProgress - 40; // 0..HOME_LEN-1
+      for(let tt=0; tt<state.tokens[p].length; tt++){
+        const pr = state.tokens[p][tt].progress;
+        if(pr >= 40 && pr < finish){
+          if((pr - 40) === slot) return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function moveToken(p, t, destProgress){
+    const tok = state.tokens[p][t];
+
+    // Captura en anillo
+    if(destProgress < 40){
+      const destIndex = (STARTS[p] + destProgress) % TRACK_LEN;
+      for(let pp=0; pp<state.numPlayers; pp++){
+        if(pp===p) continue;
+        for(let tt=0; tt<state.tokens[pp].length; tt++){
+          const pr = state.tokens[pp][tt].progress;
+          if(pr >= 0 && pr < 40){
+            const idx = (STARTS[pp] + pr) % TRACK_LEN;
+            if(idx === destIndex){
+              state.tokens[pp][tt].progress = -1; // a base
+            }
+          }
+        }
+      }
+    }
+
+    tok.progress = destProgress;
+    state.movable.clear();
+    renderAll();
+
+    const finishedAll = state.tokens[p].every(x => x.progress === 40 + HOME_LEN);
+    if(finishedAll){
+      announce(`¡${NAMES[p]} gana la partida!`);
+      state.canRoll = false;
+      return;
+    }
+
+    const extra = (state.die === 6);
+    nextPlayer(extra);
+  }
+
+  // ====== Render ======
+  function ensureSVG(){
+    elBoard.innerHTML = '';
+    svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${SIZE} ${SIZE}`);
+
+
+    const bg = document.createElementNS(svgNS,'rect');
+    bg.setAttribute('x', 0);
+    bg.setAttribute('y',0);
+    bg.setAttribute('width', SIZE);
+    bg.setAttribute('height', SIZE);
+    bg.setAttribute('class','center');
+    svg.appendChild(bg);
+
+    gTrack  = document.createElementNS(svgNS,'g');
+    gHomes  = document.createElementNS(svgNS,'g');
+    gTokens = document.createElementNS(svgNS,'g');
+    gLabels = document.createElementNS(svgNS,'g');
+
+    trackPoints.forEach((pt, i) => {
+      const c = document.createElementNS(svgNS,'circle');
+      c.setAttribute('cx', pt.x);
+      c.setAttribute('cy', pt.y);
+      c.setAttribute('r', NODE_R);
+      c.setAttribute('class', `node q${Math.floor(i/10)}`);
+      gTrack.appendChild(c);
+    });
+
+    const ring = document.createElementNS(svgNS,'circle');
+    ring.setAttribute('cx', CX);
+    ring.setAttribute('cy', CY);
+    ring.setAttribute('r', R_TRACK+NODE_R+10);
+    ring.setAttribute('fill','none');
+    ring.setAttribute('class','outline');
+    gTrack.appendChild(ring);
+
+    for(let p=0; p<4; p++){
+      homePoints[p].forEach((pt) => {
+        const c = document.createElementNS(svgNS,'circle');
+        c.setAttribute('cx', pt.x);
+        c.setAttribute('cy', pt.y);
+        c.setAttribute('r', NODE_R);
+        c.setAttribute('class','home-node');
+        gHomes.appendChild(c);
+      });
+    }
+
+    svg.appendChild(gTrack);
+    svg.appendChild(gHomes);
+    svg.appendChild(gTokens);
+    svg.appendChild(gLabels);
+    elBoard.appendChild(svg);
+  }
+
+  function renderAll(){
+    renderTokens();
+    renderLabels();
+  }
+
+  function renderTokens(){
+    gTokens.innerHTML = '';
+    for(let p=0; p<state.numPlayers; p++){
+      const list = state.tokens[p];
+      for(let t=0; t<list.length; t++){
+        const tok = list[t];
+        const {x,y} = tokenXY(p, t, tok.progress);
+
+        const g = document.createElementNS(svgNS,'g');
+
+        const c = document.createElementNS(svgNS,'circle');
+        c.setAttribute('cx', x);
+        c.setAttribute('cy', y);
+        c.setAttribute('r', NODE_R+3);
+        c.setAttribute('fill', COLORS[p]);
+        c.setAttribute('stroke', 'rgba(255,255,255,.15)');
+        c.setAttribute('stroke-width', '2');
+        c.setAttribute('class', 'token');
+        c.dataset.p = p;
+        c.dataset.t = t;
+
+        const inner = document.createElementNS(svgNS,'circle');
+        inner.setAttribute('cx', x);
+        inner.setAttribute('cy', y);
+        inner.setAttribute('r', NODE_R-3);
+        inner.setAttribute('fill', 'rgba(0,0,0,.25)');
+
+        g.appendChild(c);
+        g.appendChild(inner);
+        gTokens.appendChild(g);
+      }
+    }
+    updateTokenInteractivity();
+  }
+
+  function tokenXY(p, t, progress){
+    const finish = 40 + HOME_LEN;
+    if(progress === -1){
+      return basePoint(p, t, state.tokens[p].length);
+    }
+    if(progress >= 0 && progress < 40){
+      const idx = (STARTS[p] + progress) % TRACK_LEN;
+      return trackPoints[idx];
+    }
+    if(progress >= 40 && progress < finish){
+      const slot = progress - 40;
+      const pts = homePoints[p];
+      return pts[slot] || {x:CX,y:CY};
+    }
+    if(progress === finish){
+      return finishedPoint(p, t);
+    }
+    return {x:CX,y:CY};
+  }
+
+  function updateTokenInteractivity(){
+    const keys = new Set([...state.movable.keys()]);
+    gTokens.querySelectorAll('.token').forEach(el => {
+      const p = +el.dataset.p, t = +el.dataset.t;
+      const key = `${p}-${t}`;
+      el.classList.toggle('movable', keys.has(key));
+      el.onclick = null;
+      if(keys.has(key)){
+        el.onclick = () => {
+          const dest = state.movable.get(key);
+          moveToken(p,t,dest);
+        };
+      }
+    });
+  }
+
+function renderLabels(){
+  gLabels.innerHTML = '';
+
+  // Distancia hacia fuera desde el centro de la casilla
+  const OUT = NODE_R - 9;     // ajusta 3..6 a tu gusto
+  const RADIAL_FINE = 0;      // microajuste global (±1, ±2)
+
+  for(let p=0; p<state.numPlayers; p++){
+    const idx = STARTS[p];
+    const pt  = trackPoints[idx];
+
+    // Vector radial normalizado (centro tablero -> casilla)
+    const vx = pt.x - CX, vy = pt.y - CY;
+    const len = Math.hypot(vx, vy) || 1;
+    const ux = vx / len,  uy = vy / len;
+
+    // Punto objetivo donde queremos el CENTRO del icono
+    const targetX = pt.x + ux * (OUT + RADIAL_FINE);
+    const targetY = pt.y + uy * (OUT + RADIAL_FINE);
+
+    // Colocamos el texto, lo medimos y lo recentramos por bbox
+    const tx = document.createElementNS(svgNS,'text');
+    tx.setAttribute('x', targetX);
+    tx.setAttribute('y', targetY);
+    tx.setAttribute('text-anchor','middle');
+    tx.setAttribute('class','label icon');
+    tx.textContent = 'cottage'; // Material Symbols (ligadura)
+    gLabels.appendChild(tx);
+
+    // Medimos bounding box y aplicamos una traslación para centrar 100%
+    const bb = tx.getBBox();
+    const cx = bb.x + bb.width / 2;
+    const cy = bb.y + bb.height / 2;
+    const dx = targetX - cx;
+    const dy = targetY - cy;
+    if (dx || dy) {
+      tx.setAttribute('transform', `translate(${dx},${dy})`);
+    }
+  }
+}
+
+
+
+  function buildLegend(){
+    elLegend.innerHTML = '';
+    for(let p=0;p<state.numPlayers;p++){
+      const pill = document.createElement('div');
+      pill.className = 'pill';
+      pill.innerHTML = `
+        <span style="display:flex;align-items:center;gap:8px">
+          <span class="swatch" style="background:${COLORS[p]}"></span>
+          ${NAMES[p]}
+        </span>
+        <span>${state.tokens[p]?.length||0} fichas</span>
+      `;
+      elLegend.appendChild(pill);
+    }
+  }
+
+  // ====== Arranque ======
+  newGame();
+
+})();
+</script>
+
+</body>
+</html>

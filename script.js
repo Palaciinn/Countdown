@@ -1,10 +1,11 @@
 // ==========================
 // ⏳ Contador progresivo estable
 // ==========================
-const startDate = new Date("2025-08-18T17:30:00").getTime();
+// const startDate = new Date("2025-08-18T17:30:00").getTime();
 // Si necesitas fijar huso horario (Madrid en agosto, CEST, UTC+02):
-// const startDate = new Date("2025-08-18T17:30:00+02:00").getTime();
+// const startDate = new Date("2025-10-02T17:30:00+02:00").getTime();
 
+/*
 let timerId;
 
 const render = (elapsed) => {
@@ -44,11 +45,13 @@ document.addEventListener("visibilitychange", () => {
 
 tick();
 
+*/
+
 // ==========================
 // 🕒 Cuenta regresiva
 // ==========================
-/*
-const countdownDate = new Date("2025-08-04T08:20:00").getTime();
+
+const countdownDate = new Date("2025-11-02T08:23:59").getTime();
 
 const updateCountdown = () => {
   const now = new Date().getTime();
@@ -73,7 +76,6 @@ const updateCountdown = () => {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-*/
 
 // ==========================
 // 🖼️ Carrusel de imágenes
