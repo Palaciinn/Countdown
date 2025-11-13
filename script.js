@@ -51,7 +51,7 @@ tick();
 // 🕒 Cuenta regresiva
 // ==========================
 
-const countdownDate = new Date("2025-11-02T08:23:59").getTime();
+const countdownDate = new Date("2025-11-21T08:23:59").getTime();
 
 const updateCountdown = () => {
   const now = new Date().getTime();
