@@ -363,3 +363,20 @@ document.querySelectorAll(".custom-button .starry-background, .time-box .starry-
   // Cambiar cada minuto
   setInterval(setPhrase, 60 * 1000);
 })();
+
+
+// ==========================
+// 🧩 Registro del Service Worker (PWA)
+// ==========================
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker
+      .register("./service-worker.js")
+      .then((reg) => {
+        console.log("Service Worker registrado:", reg.scope);
+      })
+      .catch((err) => {
+        console.error("Error al registrar el Service Worker:", err);
+      });
+  });
+}
