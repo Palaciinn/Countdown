@@ -10,7 +10,7 @@
     (function () {
       const KEY1 = "countdown-theme";
       const KEY2 = "theme";
-      let theme = "dark";
+      let theme = "light";   // 👉 defecto = CLARO
 
       try {
         const stored1 = localStorage.getItem(KEY1);
@@ -20,25 +20,21 @@
           theme = stored1;
         } else if (stored2 === "light" || stored2 === "dark") {
           theme = stored2;
-        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          theme = "dark";
         } else {
-          theme = "light";
+          // no theme found → mantener "light"
         }
 
-        // sincronizamos las dos claves para que TODO el código lea lo mismo
+        // sincronizar ambas claves
         localStorage.setItem(KEY1, theme);
         localStorage.setItem(KEY2, theme);
+
       } catch (e) {
-        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-          theme = "dark";
-        } else {
-          theme = "light";
-        }
+        theme = "light";
       }
 
       document.documentElement.setAttribute("data-theme", theme);
-      var meta = document.getElementById("theme-color-meta");
+
+      const meta = document.getElementById("theme-color-meta");
       if (meta) {
         meta.setAttribute("content", theme === "dark" ? "#0b0f1a" : "#f9fafb");
       }
@@ -541,7 +537,6 @@
       }
     }
   } catch (e) {}
-
   </script>
 
 

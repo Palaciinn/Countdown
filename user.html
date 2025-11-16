@@ -70,48 +70,58 @@ html,body{
 }
 
 body{
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
+  min-height: 100vh;          /* ocupa al menos todo el alto de la ventana */
+  display: flex;
+  align-items: flex-start;     /* en móvil sigue pegado arriba */
+  justify-content: center;
 }
 
+@media (min-width: 900px){
+  body{
+    align-items: center;       /* en escritorio centramos verticalmente */
+  }
+}
+
+
+/* Contenedor principal: solo layout, NADA de panel */
 .shell{
-  width:100%;
-  max-width:720px;
-  background: radial-gradient(circle at top left,rgba(148,163,184,0.16) 0,transparent 50%),
-              radial-gradient(circle at top right,rgba(56,189,248,0.18) 0,transparent 55%),
-              radial-gradient(circle at bottom,rgba(244,114,182,0.24) 0,transparent 55%);
-  box-shadow:0 30px 80px rgba(15,23,42,0.65);
-  padding:20px 20px 24px;
-  position:relative;
-  overflow:hidden;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 0 32px;
+  position: relative;
+
+  /* 🔥 sin panel */
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible;
 }
 
-/* Shell más blanca y suave en claro */
+/* En tema claro tampoco queremos panel */
 :root[data-theme="light"] .shell{
-  background: linear-gradient(145deg,#ffffff,#e5edff);
-  box-shadow:0 18px 40px rgba(148,163,184,0.4);
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 
+/* Quitamos por completo la capa decorativa */
 .shell::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(135deg,rgba(148,163,184,0.04),rgba(15,23,42,0.8));
-  pointer-events:none;
-  mix-blend-mode:soft-light;
+  content: none !important;
 }
 
-/* Quitar mezcla oscura en claro */
 :root[data-theme="light"] .shell::before{
-  background: linear-gradient(135deg,rgba(255,255,255,0.7),rgba(226,232,240,0.8));
-  mix-blend-mode:normal;
+  content: none !important;
 }
 
+/* El inner solo sirve para z-index */
 .shell-inner{
-  position:relative;
-  z-index:1;
+  position: relative;
+  z-index: 1;
 }
+
 
 .header-row{
   display:flex;
@@ -144,6 +154,7 @@ body{
   align-items:center;
   gap:4px;
   padding:5px 10px;
+  margin-top: 10px;
   border-radius:999px;
   border:1px solid rgba(148,163,184,0.45);
   background:rgba(15,23,42,0.6);
@@ -519,7 +530,7 @@ body{
   padding:10px 16px;
   border:none;
   background:rgba(239,68,68,0.12);
-  color:#fecaca;
+  color:#e5e7eb;
   font-weight:600;
   font-size:.85rem;
   cursor:pointer;
@@ -558,7 +569,7 @@ body{
 }
 
 .footer-note{
-  margin-top:20px;
+  margin-top:30px;
   font-size:.72rem;
   color:var(--muted);
   text-align:center;
@@ -648,7 +659,7 @@ body{
             <span class="chars"><span id="bioCharsLeft">280</span> caracteres restantes</span>
             <button class="btn btn-primary" type="button" id="saveBioBtn">
               <span class="material-symbols-outlined" style="font-size:16px;">save</span>
-              Guardar notas
+              Guardar
             </button>
           </div>
 

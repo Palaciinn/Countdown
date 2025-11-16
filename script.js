@@ -377,6 +377,8 @@ const applyTheme = (theme) => {
   // Guardamos en localStorage
   try {
     localStorage.setItem(THEME_STORAGE_KEY, theme);
+    // opcional: sincronizar también con "theme" por compatibilidad
+    localStorage.setItem("theme", theme);
   } catch (e) {}
 
   // Aplicamos al <html>
@@ -396,17 +398,13 @@ const applyTheme = (theme) => {
 const getInitialTheme = () => {
   // 1) Preferencia guardada
   try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    const stored = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem("theme");
     if (stored === "light" || stored === "dark") return stored;
   } catch (e) {}
 
-  // 2) Preferencia del sistema
-  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-    return "dark";
-  }
-
-  // 3) Por defecto
-  return "dark";
+  // 2) Ya NO miramos el modo del sistema
+  // 3) Por defecto SIEMPRE claro
+  return "light";
 };
 
 // Aplica tema al cargar
@@ -428,7 +426,7 @@ if (window.matchMedia) {
   mq.addEventListener("change", (e) => {
     // Solo cambiamos automáticamente si el usuario no ha elegido uno explícito
     try {
-      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      const stored = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem("theme");
       if (!stored) {
         applyTheme(e.matches ? "dark" : "light");
       }
