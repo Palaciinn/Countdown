@@ -1,21 +1,42 @@
+/* ================================
+   🌗 Feedback: soporte light / dark
+   ================================ */
+
 body {
   margin: 0;
-  background-color: #f4c6d79c; /* Fondo del contador */
-  font-family: 'Segoe UI', sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 10px;
+  padding: 16px;
   text-align: center;
   box-sizing: border-box;
+
+  /* Colores ligados al tema global */
+  color: var(--text);
+  background:
+    var(--bg-color);
 }
 
+/* Versión más clarita cuando el tema es light */
+:root[data-theme="light"] body {
+  background:
+    radial-gradient(1000px 700px at 0% 0%, #e0edff 0%, transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%, #ffe4f5 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ================================
+   Pop-up de bloqueo inicial
+   ================================ */
+
 .popup {
-  background-color: #1e293b;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
   padding: 30px 40px;
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   width: 70vw;
   max-width: 400px;
   margin: auto;
@@ -25,87 +46,69 @@ body {
 .funny-text {
   font-size: 1rem;
   margin-bottom: 20px;
-  color: #facc15;
+  color: var(--accent-color); /* toque amarillo simpático */
 }
 
 .question-text {
   font-size: 1.1rem;
   margin-bottom: 10px;
-  color: white;
+  color: var(--text);
 }
 
 .popup input {
   padding: 10px;
   width: 80%;
   border-radius: 8px;
-  border: none;
+  border: 1px solid var(--card-border);
+  background-color: rgba(15, 23, 42, 0.3);
+  color: var(--text);
   text-align: center;
   font-size: 1rem;
   margin-bottom: 15px;
 }
 
+.popup input::placeholder {
+  color: var(--muted);
+}
+
 .popup button {
   padding: 10px 20px;
   font-size: 1rem;
-  background-color: #4ade80;
-  color: rgb(255, 255, 255);
+  background-color: var(--accent-color);
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  transition: background-color 0.3s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease;
 }
 
 .popup button:hover {
-  background-color: #22c55e;
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .error-message {
   margin-top: 10px;
-  color: #f87171;
+  color: var(--err);
   font-size: 0.9rem;
 }
 
-.main-content textarea {
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-  width: 100%;
-  resize: vertical;
-}
-
-.main-content button {
-  margin-top: 15px;
-  padding: 12px 30px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: none;
-  background-color: #2563eb;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.main-content button:hover {
-  background-color: #1d4ed8;
-}
-
-.hidden {
-  display: none;
-}
-
+/* ================================
+   Contenido principal de feedback
+   ================================ */
 
 .main-content {
   max-width: 420px;
   margin: 0 auto;
   padding: 40px 30px;
-  background-color: #1e293b;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 20px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   text-align: center;
-  color: #fff;
+  color: var(--text);
 }
 
 .main-content h1 {
@@ -131,46 +134,67 @@ body {
   padding: 10px;
   font-size: 1rem;
   border-radius: 10px;
-  border: none;
+  border: 1px solid var(--card-border);
+  background-color: rgba(15, 23, 42, 0.3);
+  color: var(--text);
+}
+
+.feedback-form select option {
+  color: #020617;
+}
+
+.feedback-form textarea {
+  resize: vertical;
+}
+
+.feedback-form input::placeholder,
+.feedback-form textarea::placeholder {
+  color: var(--muted);
 }
 
 .feedback-form button {
-  background-color: #22c55e;
+  background-color: var(--ok);
   color: white;
   border: none;
   padding: 12px;
   border-radius: 10px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease;
 }
 
 .feedback-form button:hover {
-  background-color: #16a34a;
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .hidden {
   display: none;
 }
 
-
-
+/* ================================
+   Botón flotante "Volver"
+   ================================ */
 
 .floating-button {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background-color: #1e293b;
-  color: #fff;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text);
   padding: 12px 20px;
   border-radius: 30px;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 600;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.1s ease;
   z-index: 1000;
 }
 
 .floating-button:hover {
-  background-color: #334155;
+  background-color: rgba(148, 163, 184, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }

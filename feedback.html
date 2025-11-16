@@ -4,9 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Feedback</title>
+
+  <!-- 1) CSS global con las variables y temas -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 2) CSS específico de la página de feedback -->
   <link rel="stylesheet" href="feedbackcss.css" />
+
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+  <meta name="theme-color" id="theme-color-meta" content="#0b0f1a">
+
+  <!-- 3) JS de tema reutilizable -->
+  <script src="theme.js" defer></script>
 </head>
+
 <body>
   <!-- Bloqueo inicial -->
   <div id="lock-screen" class="popup">
@@ -85,6 +96,5 @@
   </script>
 
   <a href="index.html" class="floating-button">⬅ Volver</a>
-
 </body>
 </html>
