@@ -51,7 +51,7 @@ tick();
 // 🕒 Cuenta regresiva
 // ==========================
 
-const countdownDate = new Date("2025-11-21T08:23:59").getTime();
+const countdownDate = new Date("2025-11-22T08:02:00").getTime();
 
 const updateCountdown = () => {
   const now = new Date().getTime();
@@ -435,7 +435,7 @@ if (window.matchMedia) {
 }
 
 // ==========================
-// 🧩 Registro del Service Worker (PWA)
+// 🧩 Registro del Service Worker (PWA) + auto-update
 // ==========================
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -448,4 +448,28 @@ if ("serviceWorker" in navigator) {
         console.error("Error al registrar el Service Worker:", err);
       });
   });
+
+  // Escuchar mensajes del Service Worker (nueva versión, etc.)
+  navigator.serviceWorker.addEventListener("message", (event) => {
+    if (event.data && event.data.type === "NEW_VERSION_AVAILABLE") {
+    console.log("Nueva versión de la PWA detectada.");
+
+    // Mostrar aviso visual al usuario
+    showUpdateToast();
+
+    // Esperar 1 segundo para que se vea la animación del toast
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+    }
+  });
 }
+
+function showUpdateToast() {
+  const toast = document.getElementById("update-toast");
+  if (!toast) return;
+
+  toast.style.opacity = "1";
+  toast.style.transform = "translateX(-50%) translateY(0)";
+}
+

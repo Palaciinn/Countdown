@@ -1,4 +1,4 @@
-const CACHE_NAME = "countdown-v1";
+const CACHE_NAME = "countdown-v2"; // ⬅️ súbelo a v3, v4... cuando saques versión nueva
 
 // Archivos esenciales que queremos cachear
 const ASSETS_TO_CACHE = [
@@ -31,7 +31,7 @@ const ASSETS_TO_CACHE = [
   "./register.html",
   "./user.html",
 
-  // Imágenes principales (añade las que quieras)
+  // Imágenes principales
   "./fotos/1.png",
   "./fotos/2.png",
   "./fotos/3.png",
@@ -44,7 +44,7 @@ const ASSETS_TO_CACHE = [
   "./fotos/10.png",
   "./fotos/11.png",
 
-  // Si quieres cachear vídeos, ojo con el tamaño:
+  // OJO: los vídeos pesan, la primera carga puede ser más lenta
   "./videos/1.mp4",
   "./videos/2.mp4",
   "./videos/3.mp4",
@@ -60,7 +60,6 @@ const ASSETS_TO_CACHE = [
   "./videos/13.mp4",
   "./videos/14.mp4",
   "./videos/15.mp4",
-
 ];
 
 // Instalación: pre-cache
@@ -70,21 +69,31 @@ self.addEventListener("install", (event) => {
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
+  // Activar inmediatamente la nueva versión del SW
   self.skipWaiting();
 });
 
-// Activación: limpiar versiones antiguas
+// Activación: limpiar versiones antiguas y avisar a los clientes
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
+    (async () => {
+      const keys = await caches.keys();
+
+      await Promise.all(
         keys
           .filter((key) => key !== CACHE_NAME)
           .map((key) => caches.delete(key))
-      )
-    )
+      );
+
+      await self.clients.claim();
+
+      // Avisar a todas las ventanas de que hay nueva versión
+      const clients = await self.clients.matchAll({ type: "window" });
+      for (const client of clients) {
+        client.postMessage({ type: "NEW_VERSION_AVAILABLE" });
+      }
+    })()
   );
-  self.clients.claim();
 });
 
 // Interceptar peticiones
@@ -109,7 +118,7 @@ self.addEventListener("fetch", (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // Aquí podrías devolver una página offline personalizada
+          // Página fallback offline
           return caches.match("./index.html");
         });
     })
