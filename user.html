@@ -2,428 +2,877 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Área de usuario</title>
+  <title>Area de usuario</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f1a" id="theme-color-meta" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,600,0,0" />
+
   <style>
-    :root{
-      --bg: #0b0f1a;
-      --panel: rgba(255,255,255,0.06);
-      --border: rgba(255,255,255,0.12);
-      --text: #e5e7eb;
-      --muted:#9ca3af;
-      --primary:#2563eb;
-      --ok:#22c55e;
-      --err:#ef4444;
-    }
-    *{box-sizing:border-box}
+    :root {
+  /* Valores por defecto si aún no hay data-theme */
+  --bg: #0b0f1a;
+  --panel: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.12);
+  --text: #e5e7eb;
+  --muted:#9ca3af;
+  --primary:#2563eb;
+  --ok:#22c55e;
+  --err:#ef4444;
+}
 
-    html,body{min-height: 100svh; height: auto;}
+/* ICONOS BLANCOS EN TEMA CLARO */
+:root[data-theme="light"] .material-symbols-outlined {
+    color: #F3F4FF !important;
+}
 
-    body{
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
-      color: var(--text);
-      background:
-      radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
-      radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
-      var(--bg);
-      /* Sin grid centrado verticalmente */
-      display: block;
-      padding: 24px;
-      overscroll-behavior-y: contain; /* opcional, reduce “rebote” */
-    }
+/* 🌙 Tema oscuro */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b0f1a;
+  --panel: rgba(255,255,255,0.06);
+  --border: rgba(255,255,255,0.12);
+  --text: #e5e7eb;
+  --muted:#9ca3af;
+  --primary:#2563eb;
+  --ok:#22c55e;
+  --err:#ef4444;
+}
 
+/* ☀️ Tema claro */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f4f6;
+  --panel: #ffffffee;
+  --border: rgba(148,163,184,0.35);
+  --text: #020617;
+  --muted:#6b7280;
+  --primary:#2563eb;
+  --ok:#16a34a;
+  --err:#dc2626;
+}
 
-    /* Móvil: fondo liso */
-    @media (max-width: 600px){
-      body{ background: var(--bg); }
-    }
+*{box-sizing:border-box}
 
-    .wrap{ width:min(920px,100%); display:grid; gap:18px; justify-items:center; margin: 0 auto;}
+html,body{
+  min-height:100%;
+  margin:0;
+  padding:0;
+  font-family: system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background: radial-gradient(circle at top,#1f2937 0,#020617 55%,#000 100%);
+  background-color: var(--bg);
+  color:var(--text);
+}
 
-    input, textarea, select, button { font-size: 16px; }
+/* Fondo mucho más claro en tema claro */
+:root[data-theme="light"] body{
+  background: radial-gradient(circle at top,#e5e7eb 0,#f9fafb 45%,#e5e7eb 100%);
+  background-color: var(--bg);
+}
 
-    h1{ margin:0 0 6px 0; font-weight:800; }
-    .subtitle{ margin:0 0 12px 0; color:var(--muted); text-align:center; }
+body{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+}
 
-    .card{
-      width:min(720px, 100%);
-      border:1px solid var(--border);
-      border-radius:18px;
-      background:var(--panel);
-      box-shadow:0 12px 26px rgba(0,0,0,0.28);
-      padding:18px;
-    }
+.shell{
+  width:100%;
+  max-width:720px;
+  background: radial-gradient(circle at top left,rgba(148,163,184,0.16) 0,transparent 50%),
+              radial-gradient(circle at top right,rgba(56,189,248,0.18) 0,transparent 55%),
+              radial-gradient(circle at bottom,rgba(244,114,182,0.24) 0,transparent 55%);
+  box-shadow:0 30px 80px rgba(15,23,42,0.65);
+  padding:20px 20px 24px;
+  position:relative;
+  overflow:hidden;
+}
 
-    /* Perfil */
-    .profile{
-      display:grid; gap:16px;
-      grid-template-columns: auto 1fr;
-      align-items:center;
-    }
-    @media (max-width:640px){
-      .profile{
-        grid-template-columns: 1fr;
-        justify-items:center; text-align:center;
-      }
-      /* Solo ampliamos el bloque de contenido, no el avatar */
-      .profile > div:not(.avatar-block){ width:100%; }
-      .card{ padding:16px; }
-    }
+/* Shell más blanca y suave en claro */
+:root[data-theme="light"] .shell{
+  background: linear-gradient(145deg,#ffffff,#e5edff);
+  box-shadow:0 18px 40px rgba(148,163,184,0.4);
+}
 
-    /* ===== Avatar + barra de acciones (Opción A) ===== */
-    .avatar-block{ display:grid; justify-items:center; gap:10px; }
-    .avatar-wrap{
-      position:relative;
-      width: clamp(96px, 28vw, 128px);
-      aspect-ratio: 1 / 1;
-      border-radius:50%;
-      overflow:hidden;
-      border:2px solid rgba(255,255,255,0.18);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.35);
-      background:#111827;
-    }
-    .avatar-wrap img{ width:100%; height:100%; object-fit:cover; display:block; }
+.shell::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg,rgba(148,163,184,0.04),rgba(15,23,42,0.8));
+  pointer-events:none;
+  mix-blend-mode:soft-light;
+}
 
-    .avatar-toolbar{
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
-    }
-    .avatar-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px; border-radius:999px; border:1px solid var(--border);
-      background: rgba(255,255,255,.08); color:#fff; cursor:pointer;
-      box-shadow:0 6px 14px rgba(0,0,0,.25);
-      transition: transform .12s ease, background .2s ease, opacity .2s ease, box-shadow .2s ease;
-      font-weight:600;
-    }
-    .avatar-pill:hover{
-      transform: translateY(-1px);
-      background: rgba(255,255,255,.12);
-      box-shadow:0 10px 20px rgba(0,0,0,.35);
-    }
-    .avatar-pill--danger{
-      background: rgba(239,68,68,.16);
-      border-color: rgba(239,68,68,.35);
-    }
-    .avatar-pill--danger:hover{ background: rgba(239,68,68,.24); }
-    @media (max-width:640px){
-      .avatar-toolbar{ width:100%; justify-content:center; }
-    }
+/* Quitar mezcla oscura en claro */
+:root[data-theme="light"] .shell::before{
+  background: linear-gradient(135deg,rgba(255,255,255,0.7),rgba(226,232,240,0.8));
+  mix-blend-mode:normal;
+}
 
-    .identity h2{ margin:.2rem 0 .4rem 0; font-size:1.3rem; }
+.shell-inner{
+  position:relative;
+  z-index:1;
+}
 
-    .bio{ display:grid; gap:8px; }
-    .bio textarea{
-      width:100%;
-      min-height:96px; resize:vertical;
-      border-radius:12px; border:1px solid var(--border);
-      background:rgba(255,255,255,0.08); color:var(--text);
-      padding:12px 14px; outline:none;
-      margin-top: 20px;
-      margin-bottom: 10px;
-    }
-    .bio .row{ display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .char-left{ color:var(--muted); font-size:.9rem; }
-    .save-btn{
-      appearance:none; border:none; border-radius:12px; padding:10px 14px;
-      font-weight:700; color:#fff; background:linear-gradient(135deg, #2563eb, #60a5fa);
-      box-shadow: 0 10px 22px rgba(37,99,235,0.35);
-      cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
-    }
-    .save-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(37,99,235,0.45); }
-    .save-btn:active{ transform:none; opacity:.95; }
-    .msg{ margin:0; min-height:1.2em; font-size:.95rem; color:var(--muted); }
-    .msg.ok{ color:var(--ok); }
-    .msg.err{ color:var(--err); }
+.header-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  gap:12px;
+}
 
-    /* Vida */
-    .life-card h3{ margin:0 0 10px 0; font-size:1.1rem; color:#cbd5e1; text-align:left; }
-    .life-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr)); /* móvil: 2 columnas */
-      gap:12px;
-    }
-    @media (min-width: 460px){
-      .life-grid{ grid-template-columns: repeat(3, minmax(0,1fr)); } /* más ancho: 3 */
-    }
-    .metric{
-      background:rgba(255,255,255,0.08);
-      border:1px solid var(--border);
-      border-radius:16px;
-      padding:12px;
-      display:grid; gap:4px; justify-items:center;
-      min-height:80px;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.25);
-    }
-    .metric .num{
-      font-size: clamp(1.2rem, 5.5vw, 1.6rem);
-      font-weight:800;
-      line-height:1;
-      font-variant-numeric: tabular-nums;
-    }
-    .metric .lab{ font-size:.9rem; color:var(--muted); }
-    .metric--wide{ grid-column: 1 / -1; }
-    .metric--wide .num{ font-size: clamp(1.6rem, 7vw, 2.2rem); }
-    .metric--wide .lab{ font-size: 1rem; }
+.header-title{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
 
-    /* === Botón "Volver a inicio" === */
-    .back-home-btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px 14px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-      transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-    }
-    .back-home-btn:hover{
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.12);
-      box-shadow: 0 12px 22px rgba(0,0,0,0.35);
-    }
-    .back-home-btn:active{
-      transform: translateY(0);
-      opacity: .95;
-    }
+.header-title span.small{
+  font-size:.8rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
 
-    /* Fila de acciones (volver + logout) */
-    .actions-row{
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top:0px;
-      margin-bottom: 20px;
-    }
-    .actions-row .logout-btn{
-      display:inline-flex; align-items:center; justify-content:center;
-    }
-    .logout-btn{
-      appearance:none; border:none; border-radius:12px;
-      padding:12px 16px; font-weight:700; color:#fff;
-      background:linear-gradient(135deg, #ef4444, #f97316);
-      box-shadow: 0 10px 22px rgba(239,68,68,0.35);
-      cursor:pointer; transition:transform .12s ease, box-shadow .2s ease, opacity .2s ease;
-    }
-    .logout-btn:hover{ transform:translateY(-1px); box-shadow:0 14px 26px rgba(239,68,68,0.45); }
-    .logout-btn:active{ transform:none; opacity:.95; }
+.header-title h1{
+  font-size:1.2rem;
+  margin:0;
+}
+
+.user-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 10px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,0.45);
+  background:rgba(15,23,42,0.6);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  font-size:0.9rem;
+  color:var(--muted);
+}
+
+/* Pill clarita en tema claro */
+:root[data-theme="light"] .user-pill{
+  background:#e5edff;
+  border-color:rgba(129,140,248,0.7);
+  color:#374151;
+}
+
+.user-pill .dot{
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background: #22c55e;
+  box-shadow:0 0 8px rgba(34,197,94,0.9);
+}
+
+.top-actions{
+  display:flex;
+  gap:10px;
+}
+
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,0.45);
+  background:rgba(15,23,42,0.7);
+  color:var(--text);
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(15,23,42,0.65);
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease;
+}
+
+.icon-btn:hover{
+  transform:translateY(-1px);
+  background:rgba(15,23,42,0.9);
+  box-shadow:0 12px 26px rgba(15,23,42,0.85);
+}
+
+.icon-btn:active{
+  transform:translateY(0);
+  box-shadow:0 4px 10px rgba(15,23,42,0.7);
+}
+
+.icon-btn .material-symbols-outlined{
+  font-size:20px;
+}
+
+.content-grid{
+  display:grid;
+  grid-template-columns:minmax(0,2fr) minmax(0,3fr);
+  gap:18px;
+}
+
+@media(max-width:720px){
+  .shell{
+    padding:18px 14px 20px;
+  }
+  .content-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+.card{
+  background:var(--panel);
+  border-radius:20px;
+  border:1px solid rgba(148,163,184,0.35);
+  padding:14px 14px 16px;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:0 16px 40px rgba(15,23,42,0.75);
+}
+
+/* Cartas más limpias y con sombra suave en claro */
+:root[data-theme="light"] .card{
+  box-shadow:0 12px 28px rgba(148,163,184,0.35);
+  border-color:rgba(148,163,184,0.3);
+}
+
+.card-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+  gap:8px;
+}
+
+.card-header h2{
+  margin:0;
+  font-size:.95rem;
+}
+
+.card-header span.badge{
+  font-size:.7rem;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--muted);
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid rgba(148,163,184,0.55);
+  background:rgba(15,23,42,0.6);
+}
+
+/* Badge clara en tema claro */
+:root[data-theme="light"] .card-header span.badge{
+  background:#e5edff;
+  border-color:rgba(129,140,248,0.7);
+  color:#4b5563;
+}
+
+.identity{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
+
+.avatar-wrap{
+  position:relative;
+  width:72px;
+  height:72px;
+  border-radius:999px;
+  padding:3px;
+  background:conic-gradient(from 220deg,#38bdf8,#a855f7,#f97316,#22c55e,#38bdf8);
+}
+
+.avatar-inner{
+  width:100%;
+  height:100%;
+  border-radius:999px;
+  overflow:hidden;
+  background:#020617;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.avatar-inner img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.avatar-edit{
+  position:absolute;
+  bottom:-2px;
+  right:-2px;
+  width:26px;
+  height:26px;
+  border-radius:999px;
+  background:#0f172a;
+  border:1px solid rgba(148,163,184,0.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(15,23,42,0.9);
+}
+
+.avatar-edit .material-symbols-outlined{
+  font-size:16px;
+  color:var(--text);
+}
+
+.name-block h2{
+  margin:.2rem 0 .1rem 0;
+  font-size:1.2rem;
+}
+
+.name-block .username{
+  font-size:.8rem;
+  color:var(--muted);
+}
+
+.name-block .tagline{
+  font-size:.8rem;
+  margin-top:4px;
+  color:var(--muted);
+}
+
+.life-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px;
+}
+
+@media(max-width:600px){
+  .life-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+}
+
+.metric{
+  padding:8px 10px;
+  border-radius:14px;
+  border:1px solid rgba(148,163,184,0.4);
+  background:rgba(15,23,42,0.8);
+  text-align:center;
+}
+
+/* Métricas muy claras en tema claro */
+:root[data-theme="light"] .metric{
+  background:#f3f4ff;
+  border-color:rgba(148,163,184,0.7);
+}
+
+.metric.metric--wide{
+  grid-column:1/-1;
+}
+
+.metric .num{
+  font-size:1.1rem;
+  font-weight:600;
+}
+
+.metric .lab{
+  font-size:.7rem;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+
+.bio{
+  display:grid;
+  gap:8px;
+}
+
+.bio textarea{
+  width:100%;
+  min-height:96px;
+  resize:vertical;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.08);
+  color:var(--text);
+  padding:12px 14px;
+  outline:none;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+/* Textarea blanca en tema claro */
+:root[data-theme="light"] .bio textarea{
+  background:#ffffff;
+}
+
+.bio textarea::placeholder{
+  color:rgba(148,163,184,0.9);
+}
+
+.bio .row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:.8rem;
+  color:var(--muted);
+}
+
+.bio .row .chars{
+  font-variant-numeric:tabular-nums;
+}
+
+.btn{
+  border-radius:999px;
+  border:none;
+  padding:8px 14px;
+  font-size:.8rem;
+  font-weight:600;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  transition:transform .1s ease, box-shadow .1s ease, background .15s ease, opacity .15s ease;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:#f9fafb;
+  box-shadow:0 10px 24px rgba(37,99,235,0.6);
+}
+
+.btn-primary:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 28px rgba(37,99,235,0.85);
+}
+
+.btn-primary:active{
+  transform:translateY(0);
+  box-shadow:0 6px 16px rgba(37,99,235,0.7);
+  opacity:.98;
+}
+
+.msg{
+  margin-top:6px;
+  font-size:.78rem;
+  color:var(--muted);
+}
+
+.msg.ok{ color:var(--ok); }
+.msg.err{ color:var(--err); }
+
+.actions-row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:18px;
+  flex-wrap:wrap;
+}
+
+.back-home-btn{
+  flex:1 1 40%;
+  text-align:center;
+  border-radius:999px;
+  padding:10px 16px;
+  border:1px solid rgba(148,163,184,0.5);
+  background:rgba(15,23,42,0.8);
+  color:var(--text);
+  text-decoration:none;
+  font-weight:600;
+  font-size:.85rem;
+  box-shadow:0 10px 24px rgba(15,23,42,0.75);
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease, opacity .15s ease;
+}
+
+/* Botón volver clarito en tema claro */
+:root[data-theme="light"] .back-home-btn{
+  background:#ffffff;
+  border-color:rgba(148,163,184,0.6);
+  color:#111827;
+  box-shadow:0 8px 20px rgba(148,163,184,0.5);
+}
+
+.back-home-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 30px rgba(15,23,42,0.9);
+  background:rgba(15,23,42,0.95);
+}
+
+/* Hover más suave en claro */
+:root[data-theme="light"] .back-home-btn:hover{
+  background:#f9fafb;
+  box-shadow:0 12px 26px rgba(148,163,184,0.55);
+}
+
+.back-home-btn:active{
+  transform:translateY(0);
+  box-shadow:0 6px 16px rgba(15,23,42,0.75);
+  opacity:.97;
+}
+
+/* Active en claro */
+:root[data-theme="light"] .back-home-btn:active{
+  box-shadow:0 6px 16px rgba(148,163,184,0.5);
+}
+
+.logout-btn{
+  flex:1 1 40%;
+  text-align:center;
+  border-radius:999px;
+  padding:10px 16px;
+  border:none;
+  background:rgba(239,68,68,0.12);
+  color:#fecaca;
+  font-weight:600;
+  font-size:.85rem;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(127,29,29,0.85);
+  transition:transform .12s ease, box-shadow .12s ease, background .15s ease, opacity .15s ease;
+}
+
+/* Logout estilo “pastel” en claro */
+:root[data-theme="light"] .logout-btn{
+  background:#fee2e2;
+  color:#b91c1c;
+  box-shadow:0 8px 20px rgba(248,113,113,0.55);
+}
+
+.logout-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 30px rgba(127,29,29,1);
+  background:rgba(239,68,68,0.18);
+}
+
+/* Hover logout en claro */
+:root[data-theme="light"] .logout-btn:hover{
+  background:#fecaca;
+  box-shadow:0 12px 26px rgba(248,113,113,0.6);
+}
+
+.logout-btn:active{
+  transform:translateY(0);
+  box-shadow:0 6px 16px rgba(127,29,29,0.9);
+  opacity:.97;
+}
+
+/* Active logout claro */
+:root[data-theme="light"] .logout-btn:active{
+  box-shadow:0 6px 16px rgba(248,113,113,0.55);
+}
+
+.footer-note{
+  margin-top:20px;
+  font-size:.72rem;
+  color:var(--muted);
+  text-align:center;
+}
+
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Tu perfil</h1>
-    <p class="subtitle">Configura tu Área</p>
-
-    <!-- Perfil -->
-    <section class="card profile">
-      <!-- Opción A: avatar + toolbar inferior -->
-      <div class="avatar-block">
-        <div class="avatar-wrap">
-          <img id="avatar" alt="Foto de perfil" />
-        </div>
-
-        <div class="avatar-toolbar" role="group" aria-label="Acciones de foto">
-          <button id="changePhoto" class="avatar-pill">
-            <span class="material-symbols-outlined">photo_camera</span>
-            Cambiar
-          </button>
-          <button id="removePhoto" class="avatar-pill avatar-pill--danger">
-            <span class="material-symbols-outlined">delete</span>
-            Quitar
-          </button>
-          <input id="photoInput" type="file" accept="image/*" hidden />
+  <div class="shell">
+    <div class="shell-inner">
+      <div class="header-row">
+        <div class="header-title">
+          <span class="small">Cuenta personal</span>
+          <h1>Area de usuario</h1>
+          <div class="user-pill">
+            <span class="dot"></span>
+            <span id="whoLabel">Sesión activa</span>
+          </div>
         </div>
       </div>
 
-      <div>
-        <div class="identity">
-          <h2 id="fullName">—</h2>
+      <div class="content-grid">
+        <!-- Identidad + avatar -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Perfil</h2>
+          </div>
+          <div class="identity">
+            <div class="avatar-wrap">
+              <div class="avatar-inner">
+                <img id="avatar" src="fotos/1.png" alt="Foto de perfil" />
+              </div>
+              <button class="avatar-edit" type="button" id="editAvatarBtn" title="Cambiar foto">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <input type="file" id="photoInput" accept="image/*" hidden>
+            </div>
+            <div class="name-block">
+              <h2 id="displayName">Lily</h2>
+              <div class="username" id="usernameText">@lily</div>
+              <div class="tagline" id="taglineText">Tu perfil dentro de la app ♡</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Vida vivida -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Reloj de vida</h2>
+          </div>
+
+          <div class="life-grid">
+            <div class="metric">
+              <div class="num" id="lifeYears">0</div>
+              <div class="lab">Años</div>
+            </div>
+            <div class="metric">
+              <div class="num" id="lifeDays">0</div>
+              <div class="lab">Días</div>
+            </div>
+            <div class="metric">
+              <div class="num" id="lifeHours">00</div>
+              <div class="lab">Horas</div>
+            </div>
+            <div class="metric">
+              <div class="num" id="lifeMinutes">00</div>
+              <div class="lab">Min</div>
+            </div>
+            <div class="metric metric--wide">
+              <div class="num" id="lifeSeconds">00</div>
+              <div class="lab">Seg</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Bio / notas -->
+      <section class="card" style="margin-top:16px;">
+        <div class="card-header">
+          <h2>Notas personales</h2>
         </div>
 
         <div class="bio">
-          <textarea
-            id="bio"
-            maxlength="150"
-            placeholder="Escribe una breve descripción (máx. 150 caracteres)"
-          ></textarea>
+          <textarea id="bio" maxlength="280" placeholder="Ej: Cosas que quiero hacer contigo este año ❤️"></textarea>
+
           <div class="row">
-            <span class="char-left"><span id="charsLeft">150</span> restantes</span>
-            <button id="saveBio" class="save-btn">Guardar</button>
+            <span class="chars"><span id="bioCharsLeft">280</span> caracteres restantes</span>
+            <button class="btn btn-primary" type="button" id="saveBioBtn">
+              <span class="material-symbols-outlined" style="font-size:16px;">save</span>
+              Guardar notas
+            </button>
           </div>
-          <p id="saveMsg" class="msg" aria-live="polite"></p>
+
+          <div class="msg" id="saveMsg" aria-live="polite"></div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- Vida -->
-    <section class="card life-card">
-      <h3>Tiempo de vida</h3>
-      <div class="life-grid">
-        <div class="metric"><div class="num" id="lifeYears">0</div><div class="lab">Años</div></div>
-        <div class="metric"><div class="num" id="lifeDays">0</div><div class="lab">Días</div></div>
-        <div class="metric"><div class="num" id="lifeHours">00</div><div class="lab">Horas</div></div>
-        <div class="metric"><div class="num" id="lifeMinutes">00</div><div class="lab">Min</div></div>
-        <div class="metric metric--wide"><div class="num" id="lifeSeconds">00</div><div class="lab">Seg</div></div>
+      <!-- Acciones -->
+      <div class="actions-row">
+        <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
+        <button id="logoutBtn" class="logout-btn" type="button">Cerrar sesión</button>
       </div>
-    </section>
 
-    <!-- Acciones: Volver a inicio + Cerrar sesión -->
-    <div class="actions-row">
-      <a href="index.html" class="back-home-btn" aria-label="Volver a inicio">Volver a inicio</a>
-      <button id="logoutBtn" class="logout-btn">Cerrar sesión</button>
+      <div class="footer-note">
+        Estos datos se guardan solo en este dispositivo mediante almacenamiento local.
+      </div>
     </div>
   </div>
-
   <script type="module">
     import { requireAuth, currentPlayerName, logout } from './auth.js';
 
-    const DEFAULT_AVATAR = 'fotos/1.png'; // cambia si quieres otro por defecto
+    // ==========================
+    // 🎨 Modo claro / oscuro
+    // ==========================
+    const THEME_STORAGE_KEY = "countdown-theme";
+    const themeMeta = document.getElementById("theme-color-meta");
 
-    // 🔒 Requiere sesión
+    const applyTheme = (theme) => {
+      if (theme !== "light" && theme !== "dark") return;
+      document.documentElement.setAttribute("data-theme", theme);
+      if (themeMeta) {
+        themeMeta.setAttribute("content", theme === "dark" ? "#0b0f1a" : "#f9fafb");
+      }
+    };
+
+    const getInitialTheme = () => {
+      // 1) Preferencia guardada
+      try {
+        const stored = localStorage.getItem(THEME_STORAGE_KEY);
+        if (stored === "light" || stored === "dark") return stored;
+      } catch (e) {}
+
+      // 2) Preferencia del sistema
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        return "dark";
+      }
+
+      // 3) Por defecto
+      return "dark";
+    };
+
+    const initialTheme = getInitialTheme();
+    applyTheme(initialTheme);
+
+    // Si el usuario cambia el modo del sistema y NO hemos guardado preferencia
+    if (window.matchMedia) {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      mq.addEventListener("change", (e) => {
+        try {
+          const stored = localStorage.getItem(THEME_STORAGE_KEY);
+          if (!stored) {
+            applyTheme(e.matches ? "dark" : "light");
+          }
+        } catch {}
+      });
+    }
+
+    // ==========================
+    // 🔒 Lógica de perfil
+    // ==========================
+    const DEFAULT_AVATAR = 'fotos/1.png';
+
     const s = requireAuth({ redirectTo: 'login.html' });
     if (!s) throw new Error('No session');
 
     const who = currentPlayerName(); // 'angel' | 'lily'
 
     const profiles = {
-      lily:  { first:'Lily',  last:'Manea', birthISO:'2004-05-04T00:00:00' },
-      angel: { first:'Angel', last:'Palacin', birthISO:'2002-07-10T00:00:00' }
+      lily:  { first:'Lily',  last:'Manea',  birthISO:'2004-05-04T00:00:00', tagline:'Novia del admin 💖' },
+      angel: { first:'Angel', last:'Palacín', birthISO:'2002-07-10T00:00:00', tagline:'Admin de la app 😎' }
     };
-    const me = profiles[who];
+    const me = profiles[who] ?? profiles['angel'];
 
-    // ----- UI refs
-    const avatar     = document.getElementById('avatar');
-    const photoInput = document.getElementById('photoInput');
-    const changeBtn  = document.getElementById('changePhoto');
-    const removeBtn  = document.getElementById('removePhoto');
-    const fullName   = document.getElementById('fullName');
-    const bioEl      = document.getElementById('bio');
-    const charsLeft  = document.getElementById('charsLeft');
-    const saveBioBtn = document.getElementById('saveBio');
-    const saveMsg    = document.getElementById('saveMsg');
-    const logoutBtn  = document.getElementById('logoutBtn');
+    const avatar        = document.getElementById('avatar');
+    const photoInput    = document.getElementById('photoInput');
+    const editAvatarBtn = document.getElementById('editAvatarBtn');
+    const displayNameEl = document.getElementById('displayName');
+    const usernameText  = document.getElementById('usernameText');
+    const taglineText   = document.getElementById('taglineText');
+    const whoLabel      = document.getElementById('whoLabel');
 
-    const key = (field) => `profile_${who}_${field}`;
+    const lifeYears   = document.getElementById('lifeYears');
+    const lifeDays    = document.getElementById('lifeDays');
+    const lifeHours   = document.getElementById('lifeHours');
+    const lifeMinutes = document.getElementById('lifeMinutes');
+    const lifeSeconds = document.getElementById('lifeSeconds');
 
-    function loadProfile() {
-      fullName.textContent = `${me.first} ${me.last}`;
+    const bioEl        = document.getElementById('bio');
+    const bioCharsLeft = document.getElementById('bioCharsLeft');
+    const saveBioBtn   = document.getElementById('saveBioBtn');
+    const saveMsg      = document.getElementById('saveMsg');
 
-      const savedAvatar = localStorage.getItem(key('avatar'));
-      avatar.src = savedAvatar || DEFAULT_AVATAR;
+    const logoutBtn     = document.getElementById('logoutBtn');
+    const logoutIconBtn = document.getElementById('logoutIconBtn'); // puede no existir
 
-      const savedBio = localStorage.getItem(key('bio')) || '';
-      bioEl.value = savedBio;
+    const key = (suffix) => `user:${who}:${suffix}`;
+
+    const updateCharsLeft = () => {
+      const max = bioEl.maxLength || 280;
+      const left = Math.max(0, max - bioEl.value.length);
+      bioCharsLeft.textContent = left.toString();
+    };
+
+    const loadProfile = () => {
+      displayNameEl.textContent = `${me.first}`;
+      usernameText.textContent  = `@${who}`;
+      taglineText.textContent   = me.tagline || '';
+      whoLabel.textContent      = `Estado: Activo`;
+
+      try {
+        const storedAvatar = localStorage.getItem(key('avatar'));
+        if (storedAvatar) {
+          avatar.src = storedAvatar;
+        } else {
+          avatar.src = DEFAULT_AVATAR;
+        }
+
+        const storedBio = localStorage.getItem(key('bio'));
+        if (storedBio) {
+          bioEl.value = storedBio;
+        }
+      } catch {}
+
       updateCharsLeft();
+    };
+
+    const updateLife = () => {
+      const birth = new Date(me.birthISO);
+      const now   = new Date();
+      let diffMs  = now.getTime() - birth.getTime();
+      if (diffMs < 0) diffMs = 0;
+
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours   = Math.floor(totalMinutes / 60);
+      const totalDays    = Math.floor(totalHours / 24);
+      const years        = Math.floor(totalDays / 365.25);
+      const days         = totalDays - Math.floor(years * 365.25);
+      const hours        = totalHours % 24;
+      const minutes      = totalMinutes % 60;
+      const seconds      = totalSeconds % 60;
+
+      lifeYears.textContent   = years.toString();
+      lifeDays.textContent    = days.toString();
+      lifeHours.textContent   = String(hours).padStart(2,'0');
+      lifeMinutes.textContent = String(minutes).padStart(2,'0');
+      lifeSeconds.textContent = String(seconds).padStart(2,'0');
+    };
+
+    // Avatar
+    if (editAvatarBtn && photoInput && avatar) {
+      editAvatarBtn.addEventListener('click', () => {
+        photoInput.click();
+      });
+
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          const dataUrl = reader.result;
+          if (typeof dataUrl === 'string') {
+            avatar.src = dataUrl;
+            try {
+              localStorage.setItem(key('avatar'), dataUrl);
+              saveMsg.textContent = 'Foto guardada correctamente';
+              saveMsg.className = 'msg ok';
+            } catch {
+              saveMsg.textContent = 'No se pudo guardar la foto';
+              saveMsg.className = 'msg err';
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     }
 
-    function updateCharsLeft() {
-      const left = 150 - (bioEl.value || '').length;
-      charsLeft.textContent = left;
+    // Bio
+    if (bioEl) {
+      bioEl.addEventListener('input', updateCharsLeft);
     }
 
-    // Cambiar foto
-    changeBtn.addEventListener('click', () => photoInput.click());
-    photoInput.addEventListener('change', () => {
-      const file = photoInput.files?.[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) {
-        saveMsg.textContent = 'El archivo debe ser una imagen';
-        saveMsg.className = 'msg err';
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result;
-        avatar.src = dataUrl;
+    if (saveBioBtn) {
+      saveBioBtn.addEventListener('click', () => {
         try {
-          localStorage.setItem(key('avatar'), dataUrl);
-          saveMsg.textContent = 'Foto actualizada';
+          localStorage.setItem(key('bio'), bioEl.value.trim());
+          saveMsg.textContent = 'Notas guardadas';
           saveMsg.className = 'msg ok';
         } catch {
-          saveMsg.textContent = 'No se pudo guardar la foto (tamaño muy grande)';
+          saveMsg.textContent = 'No se pudieron guardar las notas';
           saveMsg.className = 'msg err';
         }
-      };
-      reader.readAsDataURL(file);
-    });
-
-    // Quitar foto (volver por defecto)
-    removeBtn.addEventListener('click', () => {
-      try {
-        localStorage.removeItem(key('avatar'));
-        avatar.src = DEFAULT_AVATAR;
-        saveMsg.textContent = 'Foto restablecida';
-        saveMsg.className = 'msg ok';
-      } catch {
-        saveMsg.textContent = 'No se pudo restablecer la foto';
-        saveMsg.className = 'msg err';
-      }
-    });
-
-    // Guardar bio
-    bioEl.addEventListener('input', updateCharsLeft);
-    saveBioBtn.addEventListener('click', () => {
-      const text = (bioEl.value || '').trim().slice(0,150);
-      try {
-        localStorage.setItem(key('bio'), text);
-        saveMsg.textContent = 'Descripción guardada';
-        saveMsg.className = 'msg ok';
-      } catch {
-        saveMsg.textContent = 'No se pudo guardar';
-        saveMsg.className = 'msg err';
-      }
-    });
-
-    // Contador de vida
-    const birthDate = new Date(me.birthISO);
-    const pad2 = n => String(n).padStart(2,'0');
-
-    function updateLife(){
-      const now = new Date();
-
-      // Años cumplidos exactos
-      let years = now.getFullYear() - birthDate.getFullYear();
-      const hasntHadBirthday =
-        (now.getMonth() < birthDate.getMonth()) ||
-        (now.getMonth() === birthDate.getMonth() && now.getDate() < birthDate.getDate());
-      if (hasntHadBirthday) years--;
-
-      // Desde el último cumpleaños
-      const lastBirthdayYear = now.getFullYear() - (hasntHadBirthday ? 1 : 0);
-      const lastBirthday = new Date(lastBirthdayYear, birthDate.getMonth(), birthDate.getDate(), 0,0,0);
-
-      let diff = now - lastBirthday;
-      const dayMs = 24*60*60*1000, hourMs = 60*60*1000, minMs = 60*1000, secMs = 1000;
-
-      const days  = Math.floor(diff / dayMs);  diff %= dayMs;
-      const hours = Math.floor(diff / hourMs); diff %= hourMs;
-      const mins  = Math.floor(diff / minMs);  diff %= minMs;
-      const secs  = Math.floor(diff / secMs);
-
-      document.getElementById('lifeYears').textContent   = years;
-      document.getElementById('lifeDays').textContent    = days;
-      document.getElementById('lifeHours').textContent   = pad2(hours);
-      document.getElementById('lifeMinutes').textContent = pad2(mins);
-      document.getElementById('lifeSeconds').textContent = pad2(secs);
+      });
     }
 
     // Logout
-    logoutBtn.addEventListener('click', () => {
+    const doLogout = () => {
       logout();
       location.href = 'login.html';
-    });
+    };
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', doLogout);
+    }
+
+    if (logoutIconBtn) {
+      logoutIconBtn.addEventListener('click', doLogout);
+    }
 
     // Iniciar
     loadProfile();
     updateLife();
     setInterval(updateLife, 1000);
-  </script>
+</script>
 </body>
 </html>

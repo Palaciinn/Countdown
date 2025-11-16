@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="theme-color" content="#1e293b" id="theme-color-meta">
 
   <title>Cuenta atrás</title>
 
@@ -37,11 +38,16 @@
   -->
 
   <!-- Header: acceso a área de usuario -->
-  <header class="site-header" role="banner">
+   <header class="site-header" role="banner">
+    <button class="theme-toggle" id="theme-toggle" aria-label="Cambiar tema">
+      <span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+    </button>
+
     <a class="user-icon-btn" href="user.html" title="Ir a tu área" aria-label="Área de usuario">
       <span class="material-symbols-outlined">person</span>
     </a>
   </header>
+
 
   <!-- Pop-up saludo + botón desbloqueo -->
   <div id="popup-message" class="popup">

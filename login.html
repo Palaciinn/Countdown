@@ -4,241 +4,375 @@
   <meta charset="utf-8" />
   <title>Iniciar sesión</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f1a" id="theme-color-meta">
+
+  <script>
+    (function () {
+      const KEY1 = "countdown-theme";
+      const KEY2 = "theme";
+      let theme = "dark";
+
+      try {
+        const stored1 = localStorage.getItem(KEY1);
+        const stored2 = localStorage.getItem(KEY2);
+
+        if (stored1 === "light" || stored1 === "dark") {
+          theme = stored1;
+        } else if (stored2 === "light" || stored2 === "dark") {
+          theme = stored2;
+        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          theme = "dark";
+        } else {
+          theme = "light";
+        }
+
+        // sincronizamos las dos claves para que TODO el código lea lo mismo
+        localStorage.setItem(KEY1, theme);
+        localStorage.setItem(KEY2, theme);
+      } catch (e) {
+        if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          theme = "dark";
+        } else {
+          theme = "light";
+        }
+      }
+
+      document.documentElement.setAttribute("data-theme", theme);
+      var meta = document.getElementById("theme-color-meta");
+      if (meta) {
+        meta.setAttribute("content", theme === "dark" ? "#0b0f1a" : "#f9fafb");
+      }
+    })();
+  </script>
+
   <style>
-    :root{
-      --blue-1: #2563eb; /* Angel */
-      --blue-2: #60a5fa;
-      --pink-1: #ec4899; /* Lily */
-      --pink-2: #f9a8d4;
-      --bg: #0b0f1a;
-      --card-bg: rgba(255,255,255,0.06);
-      --card-border: rgba(255,255,255,0.12);
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --ok: #22c55e;
-      --err: #ef4444;
-    }
+  :root{
+    /* Colores base (no cambian con el tema) */
+    --blue-1: #2563eb; /* Angel */
+    --blue-2: #60a5fa;
+    --pink-1: #ec4899; /* Lily */
+    --pink-2: #f9a8d4;
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body{
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
-      color: var(--text);
-      background: radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
-                  radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
-                  var(--bg);
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
+    /* Valores por defecto (si aún no hay data-theme) → oscuro */
+    --bg: #0b0f1a;
+    --card-bg: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.12);
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --ok: #22c55e;
+    --err: #ef4444;
+  }
 
-    .wrap{
-      width: min(920px, 100%);
-      display: grid;
-      gap: 18px;
-      justify-items: center;
-    }
+  /* 🌙 Tema oscuro */
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b0f1a;
+    --card-bg: rgba(255,255,255,0.06);
+    --card-border: rgba(255,255,255,0.12);
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --ok: #22c55e;
+    --err: #ef4444;
+  }
 
-    h1{
-      margin: 0 0 8px 0;
-      font-weight: 800;
-      letter-spacing: .2px;
-    }
-    .subtitle{
-      margin: 0 0 22px 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-      text-align: center;
-    }
+  /* ☀️ Tema claro */
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #f3f4f6;
+    --card-bg: #ffffff;
+    --card-border: rgba(148,163,184,0.35);
+    --text: #020617;
+    --muted: #6b7280;
+    --ok: #16a34a;
+    --err: #dc2626;
+  }
 
-    .cards{
-      width: 100%;
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 18px;
-    }
-    @media (max-width: 720px){
-      .cards{ grid-template-columns: 1fr; }
-    }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
 
-    .card{
-      position: relative;
-      border: 1px solid var(--card-border);
-      border-radius: 18px;
-      background: var(--card-bg);
-      overflow: clip;
-      padding: 20px;
-      min-height: 160px;
-      display: grid;
-      align-content: start;
-      gap: 12px;
-      cursor: pointer;
-      transform: translateZ(0);
-      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
-      box-shadow: 0 10px 24px rgba(0,0,0,.25);
-      isolation: isolate;
-    }
-    .card:hover{
-      transform: translateY(-2px);
-      box-shadow: 0 16px 38px rgba(0,0,0,.35);
-    }
-    .card.active{
-      transform: translateY(-2px) scale(1.01);
-      z-index: 3;
-      box-shadow: 0 18px 48px rgba(0,0,0,.45);
-      border-color: rgba(255,255,255,.22);
-    }
+  body{
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
+    color: var(--text);
+    background: radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
+                radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
+                var(--bg);
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
 
-    .ribbon{
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(200px 120px at 20% 20%, rgba(255,255,255,.18), transparent 50%),
-                  radial-gradient(300px 180px at 80% 0%, rgba(255,255,255,.12), transparent 60%);
-      opacity: .65;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
+  /* Fondo mucho más claro en tema claro */
+  :root[data-theme="light"] body{
+    background:
+      radial-gradient(1000px 700px at 0% 0%, #e0edff 0%, transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, #ffe4f5 0%, transparent 60%),
+      var(--bg);
+  }
 
-    /* Accents */
-    .card.angel{ --accent1: var(--blue-1); --accent2: var(--blue-2); }
-    .card.lily { --accent1: var(--pink-1); --accent2: var(--pink-2); }
+  .wrap{
+    width: min(920px, 100%);
+    display: grid;
+    gap: 18px;
+    justify-items: center;
+  }
 
-    .badge{
-      display: inline-grid;
-      place-items: center;
-      width: 42px; height: 42px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      color: white;
-      font-weight: 700;
-      box-shadow: 0 8px 18px color-mix(in oklab, var(--accent1) 45%, transparent);
-      user-select: none;
-    }
+  h1{
+    margin: 0 0 8px 0;
+    font-weight: 800;
+    letter-spacing: .2px;
+  }
 
-    .title{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: .2px;
-    }
-    .hint{
-      color: var(--muted);
-      font-size: .95rem;
-      margin-top: -6px;
-    }
+  .subtitle{
+    margin: 0 0 22px 0;
+    color: var(--muted);
+    font-size: 0.95rem;
+    text-align: center;
+  }
 
-    .panel{
-      display: grid;
-      gap: 10px;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      margin-top: 6px;
-      padding-top: 10px;
-      border-top: 1px dashed rgba(255,255,255,.15);
-      overflow: hidden;
-      max-height: 0;
-      opacity: 0;
-      transform: translateY(-6px);
-      transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
-    }
-    .card.active .panel{
-      max-height: 160px;
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .cards{
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap: 18px;
+  }
+  @media (max-width: 720px){
+    .cards{ grid-template-columns: 1fr; }
+  }
 
-    .panel input{
-      appearance: none;
-      outline: none;
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-size: 1rem;
-      width: 100%;
-      transition: border-color .2s ease, background .2s ease;
-    }
-    .panel input::placeholder{ color: #cbd5e1; opacity: .6; }
-    .panel input:focus{
-      border-color: color-mix(in oklab, var(--accent1) 65%, white 15%);
-      background: rgba(255,255,255,.09);
-    }
+  .card{
+    position: relative;
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    background: var(--card-bg);
+    overflow: visible;
+    padding: 20px 34px 20px 20px;
+    min-height: 160px;
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    cursor: pointer;
+    transform: translateZ(0);
+    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease, background .25s ease;
+    box-shadow: 0 10px 24px rgba(0,0,0,.25);
+    isolation: isolate;
+  }
 
-    .btn{
-      appearance: none;
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-weight: 700;
-      color: white;
-      background: linear-gradient(135deg, var(--accent1), var(--accent2));
-      box-shadow: 0 10px 22px color-mix(in oklab, var(--accent1) 45%, transparent);
-      cursor: pointer;
-      transition: transform .12s ease, box-shadow .2s ease, opacity .2s ease;
-    }
-    .btn:hover{ transform: translateY(-1px); }
-    .btn:active{ transform: translateY(0); opacity: .95; }
+  /* Cartas más suaves en claro */
+  :root[data-theme="light"] .card{
+    box-shadow: 0 10px 24px rgba(148,163,184,.35);
+  }
 
-    .msg{
-      grid-column: 1 / -1;
-      margin: 0;
-      font-size: .95rem;
-      color: var(--muted);
-      min-height: 1.2em;
-    }
-    .msg.ok{ color: var(--ok); }
-    .msg.err{ color: var(--err); }
+  .card:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 16px 38px rgba(0,0,0,.35);
+  }
+  .card.active{
+    transform: translateY(-2px) scale(1.01);
+    z-index: 3;
+    box-shadow: 0 18px 48px rgba(0,0,0,.45);
+    border-color: rgba(255,255,255,.22);
+  }
 
-    .footer{
-      margin-top: 8px;
-      font-size: .95rem;
-      color: var(--muted);
-      text-align: center;
-    }
-    .footer a{ color: color-mix(in oklab, var(--blue-2) 70%, white 10%); text-decoration: none; }
-    .footer a:hover{ text-decoration: underline; }
+  /* Borde activo algo más suave en claro */
+  :root[data-theme="light"] .card.active{
+    border-color: rgba(129,140,248,.8);
+    box-shadow: 0 18px 40px rgba(129,140,248,.45);
+  }
 
-    .footers{
-      display: grid;
-      justify-items: center;
-      gap: 12px;        /* separación entre las dos líneas */
-      margin-top: 8px;  /* separación respecto a las tarjetas */
-    }
-    .footers .footer{
-      margin: 0;
-      line-height: 1.3;
-    }
+  .ribbon{
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(200px 120px at 20% 20%, rgba(255,255,255,.18), transparent 50%),
+                radial-gradient(300px 180px at 80% 0%, rgba(255,255,255,.12), transparent 60%);
+    opacity: .65;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
 
-    /* === Botón "Volver a inicio" === */
-    .back-home-btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.18);
-      color: var(--text);
-      text-decoration: none;
-      font-weight: 700;
-      box-shadow: 0 8px 18px rgba(0,0,0,.25);
-      transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
-      margin-top: 30px;     /* un poco de aire respecto al bloque anterior */
-    }
-    .back-home-btn:hover{
-      transform: translateY(-1px);
-      background: rgba(255,255,255,0.12);
-      box-shadow: 0 12px 22px rgba(0,0,0,.35);
-    }
-    .back-home-btn:active{
-      transform: translateY(0);
-      opacity: .95;
-    }
-  </style>
+  /* Accents */
+  .card.angel{ --accent1: var(--blue-1); --accent2: var(--blue-2); }
+  .card.lily { --accent1: var(--pink-1); --accent2: var(--pink-2); }
+
+  .badge{
+    display: inline-grid;
+    place-items: center;
+    width: 42px; height: 42px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 8px 18px color-mix(in oklab, var(--accent1) 45%, transparent);
+    user-select: none;
+  }
+
+  .title{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+
+  .hint{
+    color: var(--muted);
+    font-size: .95rem;
+    margin-top: -6px;
+  }
+
+  .panel{
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 10px;
+    border-top: 1px dashed rgba(255,255,255,.15);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: max-height .35s ease, opacity .25s ease, transform .25s ease;
+  }
+
+  /* Separador más clarito en tema claro */
+  :root[data-theme="light"] .panel{
+    border-top-color: rgba(148,163,184,.5);
+  }
+
+  .card.active .panel{
+    max-height: 160px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .panel input{
+    appearance: none;
+    outline: none;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.06);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-size: 1rem;
+    width: 100%;
+    transition: border-color .2s ease, background .2s ease;
+  }
+
+  /* Input blanco en claro */
+  :root[data-theme="light"] .panel input{
+    background: #f9fafb;
+    border-color: rgba(148,163,184,.55);
+  }
+
+  .panel input::placeholder{ color: #cbd5e1; opacity: .6; }
+
+  .panel input:focus{
+    border-color: color-mix(in oklab, var(--accent1) 65%, white 15%);
+    background: rgba(255,255,255,.09);
+  }
+
+  :root[data-theme="light"] .panel input:focus{
+    background: #ffffff;
+  }
+
+  .btn{
+    appearance: none;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    box-shadow: 0 6px 26px color-mix(in oklab, var(--accent1) 45%, transparent);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .2s ease, opacity .2s ease;
+  }
+
+  .btn:hover{ transform: translateY(-1px); }
+
+  .btn:active{ transform: translateY(0); opacity: .95; }
+
+  .msg{
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: .95rem;
+    color: var(--muted);
+    min-height: 1.2em;
+  }
+
+  .msg.ok{ color: var(--ok); }
+  .msg.err{ color: var(--err); }
+
+  .footer{
+    margin-top: 8px;
+    font-size: .95rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  .footer a{
+    color: color-mix(in oklab, var(--blue-2) 70%, white 10%);
+    text-decoration: none;
+  }
+
+  .footer a:hover{ text-decoration: underline; }
+
+  .footers{
+    display: grid;
+    justify-items: center;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .footers .footer{
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  /* === Botón "Volver a inicio" === */
+  .back-home-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(0,0,0,.25);
+    transition: transform .12s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+    margin-top: 30px;
+  }
+
+  /* Botón claro en tema claro */
+  :root[data-theme="light"] .back-home-btn{
+    background: #ffffff;
+    border-color: rgba(148,163,184,0.45);
+    color: #111827;
+    box-shadow: 0 8px 18px rgba(148,163,184,.35);
+  }
+
+  .back-home-btn:hover{
+    transform: translateY(-1px);
+    background: rgba(255,255,255,0.12);
+    box-shadow: 0 12px 22px rgba(0,0,0,.35);
+  }
+
+  :root[data-theme="light"] .back-home-btn:hover{
+    background: #f9fafb;
+    box-shadow: 0 12px 22px rgba(148,163,184,.5);
+  }
+
+  .back-home-btn:active{
+    transform: translateY(0);
+    opacity: .95;
+  }
+</style>
+
 </head>
 <body>
   <div class="wrap">
@@ -293,43 +427,38 @@
   </div>
 
   <script type="module">
-  import { loginPlayer, consumePostLoginRedirect } from './auth.js';
+    import { loginPlayer, consumePostLoginRedirect } from './auth.js';
 
-  const cards = document.querySelectorAll('.card');
+    // ==========================
+    // 🔐 Lógica de login
+    // ==========================
 
-  function activateCard(card){
-    cards.forEach(c => {
-      if (c === card) {
-        c.classList.add('active');
-        c.querySelector('.pass')?.focus();
-        c.querySelector('.msg').textContent = '';
-      } else {
-        c.classList.remove('active');
-        c.querySelector('.msg').textContent = '';
-      }
-    });
-  }
+    const cards = document.querySelectorAll('.card');
 
-  // Click o Enter para activar tarjeta
-  cards.forEach(card => {
-    card.addEventListener('click', () => activateCard(card));
-    card.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        activateCard(card);
-      }
-    });
+    function activateCard(card){
+      cards.forEach(c => {
+        const msg = c.querySelector('.msg');
+        if (c === card) {
+          c.classList.add('active');
+          c.querySelector('.pass')?.focus();
+          if (msg) msg.textContent = '';
+        } else {
+          c.classList.remove('active');
+          if (msg) msg.textContent = '';
+        }
+      });
+    }
 
-    // Submit dentro de la tarjeta
-    const btn = card.querySelector('.btn');
-    const input = card.querySelector('.pass');
-    const msg = card.querySelector('.msg');
+    async function handleLogin(card){
+      const name = card.dataset.name;
+      const input = card.querySelector('.pass');
+      const btn   = card.querySelector('.btn');
+      const msg   = card.querySelector('.msg');
 
-    async function submitCard(){
-      msg.classList.remove('ok','err');
-      msg.textContent = '';
-      const name = card.dataset.name;               // 'angel' | 'lily'
-      const pass = (input.value || '').trim();
+      if (!input || !btn || !msg) return;
+
+      msg.classList.remove('ok', 'err');
+      const pass = input.value.trim();
 
       if (!pass) {
         msg.classList.add('err');
@@ -345,37 +474,76 @@
         await loginPlayer({ name, passphrase: pass });
         msg.classList.add('ok');
         msg.textContent = 'Sesión iniciada. Redirigiendo...';
-        // ⬇️ Volver a la página que el usuario quería (o a index.html como fallback)
-        consumePostLoginRedirect('index.html');
+
+        const redirect = consumePostLoginRedirect();
+        if (redirect) {
+          location.href = redirect;
+        } else {
+          location.href = 'index.html';
+        }
       } catch (err) {
+        console.error(err);
         msg.classList.add('err');
-        msg.textContent = err?.message || 'Error al iniciar sesión';
+        msg.textContent = 'Contraseña incorrecta';
         btn.disabled = false;
         btn.textContent = 'Entrar';
+        input.focus();
         input.select();
       }
     }
 
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      submitCard();
-    });
+    cards.forEach(card => {
+      const panel = card.querySelector('.panel');
+      const input = card.querySelector('.pass');
+      const btn   = card.querySelector('.btn');
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        submitCard();
+      // Click en la tarjeta → activarla y mostrar panel
+      card.addEventListener('click', (e) => {
+        // Si ya está activa y se ha hecho click en botón o input, dejamos que lo gestionen ellos
+        if (!card.classList.contains('active')) {
+          activateCard(card);
+        }
+      });
+
+      // Botón Entrar
+      if (btn) {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleLogin(card);
+        });
       }
-      e.stopPropagation();
-    });
-  });
 
-  // Activar por defecto la primera tarjeta en pantallas grandes
-  if (window.matchMedia('(min-width: 721px)').matches) {
-    const first = document.querySelector('.card');
-    if (first) activateCard(first);
-  }
-</script>
-  
+      // Enter dentro del input
+      if (input) {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            handleLogin(card);
+          }
+        });
+      }
+    });
+
+    // Activar por defecto la primera tarjeta en pantallas grandes
+    if (window.matchMedia('(min-width: 721px)').matches) {
+      const first = document.querySelector('.card');
+      if (first) activateCard(first);
+    }
+
+      // Forzar que el tema sea el del localStorage (por si el navegador tira de bfcache / caché rara)
+  try {
+    const storedTheme = localStorage.getItem("countdown-theme") || localStorage.getItem("theme");
+    if (storedTheme === "light" || storedTheme === "dark") {
+      document.documentElement.setAttribute("data-theme", storedTheme);
+      const meta = document.getElementById("theme-color-meta");
+      if (meta) {
+        meta.setAttribute("content", storedTheme === "dark" ? "#0b0f1a" : "#f9fafb");
+      }
+    }
+  } catch (e) {}
+
+  </script>
+
+
 </body>
 </html>

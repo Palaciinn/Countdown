@@ -364,6 +364,77 @@ document.querySelectorAll(".custom-button .starry-background, .time-box .starry-
   setInterval(setPhrase, 60 * 1000);
 })();
 
+// ==========================
+// 🎨 Modo claro / oscuro
+// ==========================
+const THEME_STORAGE_KEY = "countdown-theme";
+
+const themeMeta = document.querySelector('meta[name="theme-color"]') || document.getElementById("theme-color-meta");
+const themeToggleBtn = document.getElementById("theme-toggle");
+const themeIcon = document.getElementById("theme-icon");
+
+const applyTheme = (theme) => {
+  // Guardamos en localStorage
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch (e) {}
+
+  // Aplicamos al <html>
+  document.documentElement.setAttribute("data-theme", theme);
+
+  // Cambiamos el meta theme-color para la PWA / barra del navegador
+  if (themeMeta) {
+    themeMeta.setAttribute("content", theme === "dark" ? "#0f172a" : "#f9fafb");
+  }
+
+  // Icono del botón
+  if (themeIcon) {
+    themeIcon.textContent = theme === "dark" ? "light_mode" : "dark_mode";
+  }
+};
+
+const getInitialTheme = () => {
+  // 1) Preferencia guardada
+  try {
+    const stored = localStorage.getItem(THEME_STORAGE_KEY);
+    if (stored === "light" || stored === "dark") return stored;
+  } catch (e) {}
+
+  // 2) Preferencia del sistema
+  if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    return "dark";
+  }
+
+  // 3) Por defecto
+  return "dark";
+};
+
+// Aplica tema al cargar
+const initialTheme = getInitialTheme();
+applyTheme(initialTheme);
+
+// Toggle al pulsar el botón
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener("click", () => {
+    const current = document.documentElement.getAttribute("data-theme") || initialTheme;
+    const next = current === "dark" ? "light" : "dark";
+    applyTheme(next);
+  });
+}
+
+// Si el usuario cambia el modo del sistema mientras está abierta la app
+if (window.matchMedia) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener("change", (e) => {
+    // Solo cambiamos automáticamente si el usuario no ha elegido uno explícito
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      if (!stored) {
+        applyTheme(e.matches ? "dark" : "light");
+      }
+    } catch (err) {}
+  });
+}
 
 // ==========================
 // 🧩 Registro del Service Worker (PWA)
