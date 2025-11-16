@@ -1,4 +1,4 @@
-const CACHE_NAME = "countdown-v3"; // ⬅️ súbelo a v3, v4... cuando saques versión nueva
+const CACHE_NAME = "countdown-v4"; // súbelo a v4, v5... cuando saques versión nueva
 
 // Archivos esenciales que queremos cachear
 const ASSETS_TO_CACHE = [
@@ -103,10 +103,19 @@ self.addEventListener("fetch", (event) => {
   // Solo cacheamos GET
   if (request.method !== "GET") return;
 
+  const url = new URL(request.url);
+
+  // ❌ No cachear NUNCA las peticiones a Supabase (datos dinámicos)
+  if (url.hostname.includes("supabase.co")) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
+  // ✅ Resto de archivos (HTML, CSS, JS, imágenes, vídeos...) sí se cachean
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       if (cachedResponse) {
-        // Devuelve de cache si existe
+        // Devuelve de caché si existe
         return cachedResponse;
       }
 
