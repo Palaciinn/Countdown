@@ -24,7 +24,7 @@ function applyTheme(theme) {
 
   // Actualizar <meta name="theme-color">
   if (themeMeta) {
-    const color = theme === "dark" ? "#0b0f1a" : "#f3f4f6";
+    const color = theme === "dark" ? "#0b0f1a" : "#E8CFDA";
     themeMeta.setAttribute("content", color);
   }
 
