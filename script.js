@@ -397,7 +397,7 @@ const applyTheme = (theme) => {
 
   // Cambiamos el meta theme-color para la PWA / barra del navegador
   if (themeMeta) {
-    themeMeta.setAttribute("content", theme === "dark" ? "#0f172a" : "#f9fafb");
+    themeMeta.setAttribute("content", theme === "dark" ? "#0f172a" : "#E8CFDA");
   }
 
   // Icono del botón
