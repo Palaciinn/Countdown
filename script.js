@@ -51,7 +51,7 @@ tick();
 // 🕒 Cuenta regresiva
 // ==========================
 
-const countdownDate = new Date("2025-12-05T08:19:00").getTime();
+const countdownDate = new Date("2025-12-06T02:30:00").getTime();
 
 const updateCountdown = () => {
   const now = new Date().getTime();
@@ -92,7 +92,18 @@ const imageList = [
   "fotos/8.png",
   "fotos/9.png",
   "fotos/10.png",
-  "fotos/11.png"
+  "fotos/11.png",
+  "fotos/12.png",
+  "fotos/13.png",
+  "fotos/14.png",
+  "fotos/15.png",
+  "fotos/16.png",
+  "fotos/17.png",
+  "fotos/18.png",
+  "fotos/19.png",
+  "fotos/20.png",
+  "fotos/21.png",
+  "fotos/22.png"
 ];
 let currentImageIndex = 0;
 

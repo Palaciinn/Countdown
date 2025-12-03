@@ -44,7 +44,7 @@
 /* ⚪ Tema claro */
 :root[data-theme="light"] {
   color-scheme: light;
-  --bg-color: #f9fafb;
+  --bg-color: #E8CFDA;
   --text-color: #020617;
 
   --card-bg: #e5e7eb;
