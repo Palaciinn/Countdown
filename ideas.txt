@@ -1,0 +1,5 @@
+Mapa interactivo con todos los lugares importantes (primera cita, viaje más especial, etc.).
+Sistema de insignias en el perfil.
+Últimos viajes sincronizados con el countdown.
+Sección de videos graciosos.
+Recap anual.

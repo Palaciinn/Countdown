@@ -1,4 +1,4 @@
-const CACHE_NAME = "countdown-v6.7"; // súbelo a v4, v5... cuando saques versión nueva
+const CACHE_NAME = "countdown-v6.8"; // súbelo a v4, v5... cuando saques versión nueva
 
 // Archivos esenciales que queremos cachear
 const ASSETS_TO_CACHE = [
