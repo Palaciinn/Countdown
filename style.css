@@ -701,3 +701,60 @@ body.locked .user-icon-btn { cursor: default; }
 /* Si lo prefieres oculto del todo, usa esto en su lugar: */
 /* body.locked .site-header { display: none; } */
 
+
+
+
+
+/* pequeña animación */
+@keyframes pop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* El botón permite posicionar cosas encima */
+.custom-button {
+  position: relative;
+  overflow: hidden; /* por si acaso */
+}
+
+/* Pegatina NEW para los botones que la lleven */
+.custom-button--new .new-badge {
+  position: absolute;
+  top: 10%;        /* separacion desde arriba */
+  right: 75%;     /* separacion desde la derecha */
+  width: 54px;     /* tamaño de la pegatina */
+  pointer-events: none; /* no molesta al click del botón */
+  z-index: 3;
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.7));
+  transform: rotate(-5deg);          /* toque pegatina */
+  animation: sticker-pop 0.4s ease, pulse 1.8s ease-in-out infinite;
+  /* color rojo */
+filter: brightness(0) saturate(100%) invert(33%) sepia(82%) saturate(2400%) hue-rotate(330deg) brightness(105%) contrast(110%);
+}
+
+@keyframes pulse {
+  0% {
+    transform: rotate(-5deg) scale(1);
+    box-shadow: 0 0 4px rgba(255, 77, 110, 0);
+  }
+  50% {
+    transform: rotate(-5deg) scale(1.12);
+    box-shadow: 0 0 10px rgba(255, 77, 110, 0);
+  }
+  100% {
+    transform: rotate(-5deg) scale(1);
+    box-shadow: 0 0 4px rgba(255, 77, 110, 0);
+  }
+}
+
+
+@keyframes sticker-pop {
+  0% {
+    transform: scale(0.6) rotate(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(-5deg);
+    opacity: 1;
+  }
+}
