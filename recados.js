@@ -1,8 +1,5 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-const supabaseUrl = 'https://bdgivulpjwzlnjgmwazm.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZ2l2dWxwand6bG5qZ213YXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODU4OTUsImV4cCI6MjA2OTQ2MTg5NX0.tWxMsaPa_4XHXJhZUpL_QKxxGYrkhCrI_L_qZr9ILsc';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Usamos el cliente compartido desde auth.js
+import { supabase } from "./auth.js";
 
 // === Cargar recados al iniciar ===
 window.addEventListener("DOMContentLoaded", async () => {
@@ -13,10 +10,10 @@ window.addEventListener("DOMContentLoaded", async () => {
 // === Función para cargar recados según el nombre ===
 async function cargarRecados(nombre, contenedorId) {
   const { data, error } = await supabase
-    .from('recados')
-    .select('*')
-    .eq('nombre', nombre)
-    .order('id', { ascending: true });
+    .from("recados")
+    .select("*")
+    .eq("nombre", nombre)
+    .order("id", { ascending: true });
 
   if (error) {
     console.error("Error al cargar recados:", error);
@@ -26,7 +23,7 @@ async function cargarRecados(nombre, contenedorId) {
   const lista = document.getElementById(contenedorId);
   lista.innerHTML = "";
 
-  data.forEach(recado => {
+  data.forEach((recado) => {
     const li = document.createElement("li");
     li.className = `recado-item ${recado.completado ? "completed" : ""}`;
     li.innerHTML = `
@@ -41,16 +38,19 @@ async function cargarRecados(nombre, contenedorId) {
     li.querySelector("input").addEventListener("change", async (e) => {
       const nuevoEstado = e.target.checked;
       await supabase
-        .from('recados')
+        .from("recados")
         .update({ completado: nuevoEstado })
-        .eq('id', recado.id);
+        .eq("id", recado.id);
 
       li.classList.toggle("completed", nuevoEstado);
     });
 
     // Evento para eliminar recado
     li.querySelector(".delete-recado").addEventListener("click", async () => {
-      const { error } = await supabase.from('recados').delete().eq('id', recado.id);
+      const { error } = await supabase
+        .from("recados")
+        .delete()
+        .eq("id", recado.id);
       if (error) {
         console.error("Error al eliminar recado:", error);
         alert("No se pudo eliminar el recado");
@@ -68,6 +68,7 @@ document.getElementById("open-add-recado").addEventListener("click", (e) => {
   e.preventDefault();
   document.getElementById("recado-popup").classList.remove("hidden");
 });
+
 document.getElementById("close-popup").addEventListener("click", () => {
   document.getElementById("recado-popup").classList.add("hidden");
 });
@@ -83,8 +84,8 @@ document.getElementById("add-recado-btn").addEventListener("click", async () => 
   }
 
   // Insertar en Supabase
-  const { data, error } = await supabase
-    .from('recados')
+  const { error } = await supabase
+    .from("recados")
     .insert([{ nombre: user, texto: texto, completado: false }]);
 
   if (error) {
