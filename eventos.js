@@ -1,16 +1,12 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-// Configura tu Supabase
-const supabaseUrl = 'https://bdgivulpjwzlnjgmwazm.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJkZ2l2dWxwand6bG5qZ213YXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM4ODU4OTUsImV4cCI6MjA2OTQ2MTg5NX0.tWxMsaPa_4XHXJhZUpL_QKxxGYrkhCrI_L_qZr9ILsc';
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Usamos el cliente compartido desde auth.js (mismo que en recados.js)
+import { supabase } from "./auth.js";
 
 // === Mostrar popup para añadir evento ===
 document.getElementById("open-add-event").addEventListener("click", (e) => {
   e.preventDefault();
   document.getElementById("event-popup").classList.remove("hidden");
 });
+
 document.getElementById("close-popup").addEventListener("click", () => {
   document.getElementById("event-popup").classList.add("hidden");
 });
@@ -33,12 +29,14 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
 
   // Insertar en Supabase
   const { data, error } = await supabase
-    .from('eventos')
-    .insert([{ 
-      titulo: String(title), 
-      fecha: String(fixedDate.getTime()), 
-      fijo: false 
-    }])
+    .from("eventos")
+    .insert([
+      {
+        titulo: String(title),
+        fecha: String(fixedDate.getTime()),
+        fijo: false,
+      },
+    ])
     .select();
 
   if (error) {
@@ -48,7 +46,12 @@ document.getElementById("add-event-btn").addEventListener("click", async () => {
   }
 
   console.log("✅ Evento guardado correctamente:", data);
-  renderEvent({ id: data[0].id, titulo: title, fecha: fixedDate.getTime(), fijo: false });
+  renderEvent({
+    id: data[0].id,
+    titulo: title,
+    fecha: fixedDate.getTime(),
+    fijo: false,
+  });
 
   document.getElementById("event-title").value = "";
   document.getElementById("event-date").value = "";
@@ -66,12 +69,12 @@ function renderEvent(evento) {
 
   card.innerHTML = `
     <h2>${isBirthday ? "🎂" : "🎉"} ${evento.titulo}</h2>
-    <p class="date-note">${fecha.toLocaleDateString("es-ES", { 
-      day: "numeric", 
-      month: "long", 
-      year: "numeric", 
-      hour: "2-digit", 
-      minute: "2-digit" 
+    <p class="date-note">${fecha.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     })}</p>
     <div class="countdown"></div>
     ${!isBirthday ? `<button class="delete-btn">🗑️ Eliminar</button>` : ""}
@@ -83,7 +86,7 @@ function renderEvent(evento) {
   // Botón eliminar solo para eventos dinámicos
   if (!isBirthday) {
     card.querySelector(".delete-btn").addEventListener("click", async () => {
-      const { error } = await supabase.from('eventos').delete().eq('id', evento.id);
+      const { error } = await supabase.from("eventos").delete().eq("id", evento.id);
       if (error) {
         console.error("Error al eliminar:", error);
         alert("Error al eliminar el evento");
@@ -119,8 +122,8 @@ function iniciarCuentaAtras(elemento, fechaObjetivo) {
 
 // === Inicializar cumpleaños y cargar eventos Supabase ===
 window.addEventListener("DOMContentLoaded", async () => {
-  // 1️⃣ Inicializar cumpleaños fijos
-  document.querySelectorAll(".countdown[data-date]").forEach(el => {
+  // 1️⃣ Inicializar cumpleaños fijos (los que vienen en el HTML con data-date)
+  document.querySelectorAll(".countdown[data-date]").forEach((el) => {
     let targetDate = new Date(el.dataset.date);
     const now = new Date();
     if (targetDate < now) {
@@ -131,14 +134,14 @@ window.addEventListener("DOMContentLoaded", async () => {
 
   // 2️⃣ Cargar eventos guardados en Supabase ordenados por fecha ascendente
   const { data, error } = await supabase
-    .from('eventos')
-    .select('*')
-    .order('fecha', { ascending: true });
+    .from("eventos")
+    .select("*")
+    .order("fecha", { ascending: true });
 
   if (error) {
     console.error("Error al cargar eventos:", error);
     return;
   }
 
-  data.forEach(evento => renderEvent(evento));
+  data.forEach((evento) => renderEvent(evento));
 });
