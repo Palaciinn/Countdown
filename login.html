@@ -36,7 +36,8 @@
 
       const meta = document.getElementById("theme-color-meta");
       if (meta) {
-        meta.setAttribute("content", theme === "dark" ? "#0b0f1a" : "#f9fafb");
+        // 👇 mismo color que --bg en cada tema
+        meta.setAttribute("content", theme === "dark" ? "#0b0f1a" : "#f3f4f6");
       }
     })();
   </script>
@@ -90,20 +91,11 @@
     margin: 0;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial;
     color: var(--text);
-    background: radial-gradient(1200px 800px at 20% -10%, #1f2847 0%, transparent 60%),
-                radial-gradient(1000px 600px at 120% 20%, #2b1440 0%, transparent 55%),
-                var(--bg);
+    /* 👇 fondo plano usando --bg para que coincida con la barra del iPhone */
+    background-color: var(--bg);
     display: grid;
     place-items: center;
     padding: 24px;
-  }
-
-  /* Fondo mucho más claro en tema claro */
-  :root[data-theme="light"] body{
-    background:
-      radial-gradient(1000px 700px at 0% 0%, #e0edff 0%, transparent 60%),
-      radial-gradient(1000px 700px at 100% 0%, #ffe4f5 0%, transparent 60%),
-      var(--bg);
   }
 
   .wrap{
@@ -525,17 +517,17 @@
       if (first) activateCard(first);
     }
 
-      // Forzar que el tema sea el del localStorage (por si el navegador tira de bfcache / caché rara)
-  try {
-    const storedTheme = localStorage.getItem("countdown-theme") || localStorage.getItem("theme");
-    if (storedTheme === "light" || storedTheme === "dark") {
-      document.documentElement.setAttribute("data-theme", storedTheme);
-      const meta = document.getElementById("theme-color-meta");
-      if (meta) {
-        meta.setAttribute("content", storedTheme === "dark" ? "#0b0f1a" : "#f9fafb");
+    // Forzar que el tema sea el del localStorage (por si el navegador tira de bfcache / caché rara)
+    try {
+      const storedTheme = localStorage.getItem("countdown-theme") || localStorage.getItem("theme");
+      if (storedTheme === "light" || storedTheme === "dark") {
+        document.documentElement.setAttribute("data-theme", storedTheme);
+        const meta = document.getElementById("theme-color-meta");
+        if (meta) {
+          meta.setAttribute("content", storedTheme === "dark" ? "#0b0f1a" : "#f3f4f6");
+        }
       }
-    }
-  } catch (e) {}
+    } catch (e) {}
   </script>
 
 
