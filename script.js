@@ -145,6 +145,11 @@ const errorMessage = document.getElementById("error-message");
 const questionText = document.getElementById("question-text");
 const changeQuestionBtn = document.getElementById("change-question");
 
+// Si solo hay 1 pregunta, ocultamos el botón de recargar y evitamos lógica de "otra distinta"
+if (questions.length <= 1 && changeQuestionBtn) {
+  changeQuestionBtn.style.display = "none";
+}
+
 // Helper para mostrar el banner correctamente (quita 'hidden' y añade 'show')
 const showInfoBanner = () => {
   const infoBanner = document.getElementById("info-banner");
@@ -214,9 +219,14 @@ const maxChangesBeforeMsg = 2;
 
 const loadRandomQuestion = () => {
   let newQuestion;
-  do {
-    newQuestion = questions[Math.floor(Math.random() * questions.length)];
-  } while (newQuestion.question === currentQuestion);
+
+  if (questions.length === 1) {
+    newQuestion = questions[0];
+  } else {
+    do {
+      newQuestion = questions[Math.floor(Math.random() * questions.length)];
+    } while (newQuestion.question === currentQuestion);
+  }
 
   currentQuestion = newQuestion.question;
   questionText.textContent = currentQuestion;
@@ -224,11 +234,7 @@ const loadRandomQuestion = () => {
   answerInput.value = "";
   answerInput.focus();
 
-  if (changeCount > maxChangesBeforeMsg) {
-    errorMessage.textContent = "¿Eres tonta o cotilla?";
-  } else {
-    errorMessage.textContent = "";
-  }
+  errorMessage.textContent = "";
 };
 
 unlockBtn.addEventListener("click", () => {
@@ -241,26 +247,16 @@ unlockBtn.addEventListener("click", () => {
 
 submitAnswer.addEventListener("click", () => {
   const userAnswer = answerInput.value.trim().toLowerCase();
-  const isCorrect =
-    typeof currentAnswer === "string"
-      ? userAnswer === currentAnswer
-      : currentAnswer.includes(userAnswer);
+  const expected = String(currentAnswer).trim().toLowerCase();
+
+  const isCorrect = userAnswer === expected;
 
   if (isCorrect) {
-    // Ocultar el popup de la pregunta y quitar blur
     questionPopup.classList.add("hidden");
     mainContent.classList.remove("blur");
-
-    // ✅ Quitar el estado bloqueado para que el header sea clickable ya
     document.body.classList.remove("locked");
-
-    // Mostrar banner
     showInfoBanner();
-
-    // Guardar la ventana de desbloqueo
     try { setUnlockedForWindow(); } catch (e) {}
-
-    // (Opcional) Asegurar el popup inicial escondido por si acaso
     popup.classList.add("hidden");
   } else {
     errorMessage.textContent = "Respuesta incorrecta. Intenta de nuevo.";
