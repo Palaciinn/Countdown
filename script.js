@@ -145,11 +145,6 @@ const errorMessage = document.getElementById("error-message");
 const questionText = document.getElementById("question-text");
 const changeQuestionBtn = document.getElementById("change-question");
 
-// Si solo hay 1 pregunta, ocultamos el botón de recargar y evitamos lógica de "otra distinta"
-if (questions.length <= 1 && changeQuestionBtn) {
-  changeQuestionBtn.style.display = "none";
-}
-
 // Helper para mostrar el banner correctamente (quita 'hidden' y añade 'show')
 const showInfoBanner = () => {
   const infoBanner = document.getElementById("info-banner");
@@ -207,10 +202,17 @@ const applyUnlockState = () => {
 // Aplicar estado al cargar
 document.addEventListener("DOMContentLoaded", applyUnlockState);
 
-// Preguntas y respuestas
+// ==========================
+// ✅ Preguntas y respuestas (ÚNICA parte tocada)
+// ==========================
 const questions = [
   { question: "Introduzca la contraseña", answer: "L201225A" }
 ];
+
+// Si solo hay 1 pregunta, ocultamos el botón de recargar (si existe)
+if (questions.length <= 1 && changeQuestionBtn) {
+  changeQuestionBtn.style.display = "none";
+}
 
 let currentAnswer = "";
 let currentQuestion = "";
@@ -220,6 +222,7 @@ const maxChangesBeforeMsg = 2;
 const loadRandomQuestion = () => {
   let newQuestion;
 
+  // Evita bucle infinito si solo hay 1 pregunta
   if (questions.length === 1) {
     newQuestion = questions[0];
   } else {
@@ -246,6 +249,7 @@ unlockBtn.addEventListener("click", () => {
 });
 
 submitAnswer.addEventListener("click", () => {
+  // Case-insensitive: da igual mayúsculas/minúsculas
   const userAnswer = answerInput.value.trim().toLowerCase();
   const expected = String(currentAnswer).trim().toLowerCase();
 
@@ -263,10 +267,13 @@ submitAnswer.addEventListener("click", () => {
   }
 });
 
-changeQuestionBtn.addEventListener("click", () => {
-  changeCount++;
-  loadRandomQuestion();
-});
+// Si el botón existe, permitimos "cambiar pregunta" (aunque con 1 está oculto)
+if (changeQuestionBtn) {
+  changeQuestionBtn.addEventListener("click", () => {
+    changeCount++;
+    loadRandomQuestion();
+  });
+}
 
 // ==========================
 // 🌟 Estrellas de fondo SOLO en sección
@@ -474,4 +481,3 @@ function showUpdateToast() {
   toast.style.opacity = "1";
   toast.style.transform = "translateX(-50%) translateY(0)";
 }
-
