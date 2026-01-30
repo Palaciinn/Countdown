@@ -204,12 +204,7 @@ document.addEventListener("DOMContentLoaded", applyUnlockState);
 
 // Preguntas y respuestas
 const questions = [
-  { question: "¿Cómo se llama mi perro?", answer: "marcus" },
-  { question: "¿Cómo se llama el novio de mi madre?", answer: "jose" },
-  { question: "¿En qué medio de transporte transportan mi ego?", answer: "avion" },
-  { question: "¿Cuál es mi cóctel favorito?", answer: "mojito" },
-  { question: "¿De qué team soy?", answer: "tetas" },
-  { question: "¿De qué lado está mi boobbie favorita?", answer: ["izquierdo", "izquierda"] }
+  { question: "Introduzca la contraseña", answer: "L201225A" }
 ];
 
 let currentAnswer = "";
