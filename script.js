@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", applyUnlockState);
 // ✅ Preguntas y respuestas (ÚNICA parte tocada)
 // ==========================
 const questions = [
-  { question: "Introduzca la contraseña", answer: "L201225A" }
+  { question: "Introduzca la contraseña" }
 ];
 
 // Si solo hay 1 pregunta, ocultamos el botón de recargar (si existe)
@@ -233,7 +233,10 @@ const loadRandomQuestion = () => {
 
   currentQuestion = newQuestion.question;
   questionText.textContent = currentQuestion;
-  currentAnswer = newQuestion.answer;
+
+  // Ya no guardamos la respuesta en el front
+  currentAnswer = "";
+
   answerInput.value = "";
   answerInput.focus();
 
@@ -248,22 +251,37 @@ unlockBtn.addEventListener("click", () => {
   loadRandomQuestion();
 });
 
-submitAnswer.addEventListener("click", () => {
-  // Case-insensitive: da igual mayúsculas/minúsculas
-  const userAnswer = answerInput.value.trim().toLowerCase();
-  const expected = String(currentAnswer).trim().toLowerCase();
+submitAnswer.addEventListener("click", async () => {
+  const userAnswer = answerInput.value.trim();
 
-  const isCorrect = userAnswer === expected;
+  // Si no existe el cliente, avisamos (no tocamos nada más)
+  if (!window.sb || !window.sb.functions || typeof window.sb.functions.invoke !== "function") {
+    errorMessage.textContent = "Error de conexión. Recarga la página.";
+    return;
+  }
 
-  if (isCorrect) {
-    questionPopup.classList.add("hidden");
-    mainContent.classList.remove("blur");
-    document.body.classList.remove("locked");
-    showInfoBanner();
-    try { setUnlockedForWindow(); } catch (e) {}
-    popup.classList.add("hidden");
-  } else {
-    errorMessage.textContent = "Respuesta incorrecta. Intenta de nuevo.";
+  try {
+    const { data, error } = await window.sb.functions.invoke("check-pass", {
+      body: { pass: userAnswer }
+    });
+
+    if (error) throw error;
+
+    const isCorrect = data?.ok === true;
+
+    if (isCorrect) {
+      questionPopup.classList.add("hidden");
+      mainContent.classList.remove("blur");
+      document.body.classList.remove("locked");
+      showInfoBanner();
+      try { setUnlockedForWindow(); } catch (e) {}
+      popup.classList.add("hidden");
+    } else {
+      errorMessage.textContent = "Respuesta incorrecta. Intenta de nuevo.";
+    }
+  } catch (err) {
+    console.error("Edge Function error:", err);
+    errorMessage.textContent = "Error de verificación. Inténtalo de nuevo.";
   }
 });
 
