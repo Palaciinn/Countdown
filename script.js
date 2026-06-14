@@ -51,7 +51,7 @@ tick();
 // 🕒 Cuenta regresiva
 // ==========================
 
-const countdownDate = new Date("2026-03-16T00:50:00").getTime();
+const countdownDate = new Date("2026-06-16T11:30:00").getTime();
 
 const updateCountdown = () => {
   const now = new Date().getTime();
